@@ -1,0 +1,1528 @@
+var issueListDefaults = [
+  {name:'url',value:base_apiUrl+'/event/list'}
+  ,{name:'output',value:'json'}
+]; /* index.js 안에서 메인 페이지의 목록에서만 쓰다가 검색이 전체 페이지에 들어가면서 common.js로 옮김 */
+
+$(function() {
+  // 폼 미리보기 처리
+  $('form').each(function(index, obj) {
+    $(this).attr('origAction', this.action);
+    $(this).attr('origTarget', this.target);
+  });
+  $('form input.preview').click(function(event) {
+    this.form.action = this.form.elements['eventPreviewUrl'].value;
+    this.form.target = $(this.form.elements['eventPreviewUrl']).attr('target');
+  });
+  $('form input:submit').not('.preview').click(function(event) {
+    this.form.action = $(this.form).attr('origAction');
+    this.form.target = $(this.form).attr('origTarget');
+  });
+
+  /* 검색 필드, jquery ui autocomplete 사용 */
+  // 검색 버튼은 기본으로 그냥 form submit이고, index.js에서는 자체 검색하도록 이벤트 처리함.
+  $('form','#searchBox').submit(function() {
+    var field = $('#searchBox').find('input[name="s"]'),
+      keyword = $.trim(field.val()); // field에 다시 할당할 경우 preedit 상태의 미완성 한글이 그대로 commit되거나 사라지는 문제가 생길 수 있음
+    if (keyword == '') return false;
+    else if (keyword == field.attr('title')) return false;
+  });
+  $('.reset','#searchBox').click(function() {
+    $('.navigation .search form').reset().find('input[name="s"]').addClass('fieldOut');
+    return false;
+  });
+  var searchBox=$('.field','#searchBox');
+  if (searchBox.length>0) {
+    searchBox = searchBox.focus(function() {
+      if ($(this).val() == this.title) { $(this).val('').removeClass('fieldOut'); }
+      else $(this).toggleClass('fieldOut', $(this).val()=='');
+    }).blur(function() {
+      if ($(this).val() == '') { $(this).val(this.title).addClass('fieldOut'); }
+    }).autocomplete({
+      delay: 500
+      ,minLength: 2 // 서버측은 2글자 제한
+      ,appendTo: '#searchBox'
+      ,source: '/_/xmlProxy/xmlProxy.ofm?'+$.param($.merge([{name:'pageRows',value:20}], issueListDefaults))
+      ,focus: function(event, ui) {
+        $(event.target).val(ui.item.label);
+        return false;
+      }
+      ,select: function(event, ui) {
+        location.href=ui.item.value;
+        return false;
+      }
+    }).data('ui-autocomplete');
+    if (typeof searchBox != 'undefined') {
+      searchBox._response = function(data) {
+        if(typeof data != 'undefined' && typeof data.error != 'undefined' && typeof data.error.code != 'undefined' && data.error.code == 0){
+          var keyword = data.config.where.searchAll;
+          data=this._normalize(data);
+          this._suggest(data);
+          if (data.length == 0) {
+            this.menu.element.append('<center class="empty">검색 결과가 없습니다.</center>');
+          } else {
+            $('a',this.menu.element).highlight(keyword); // 검색어 강조 추가
+          }
+          this._trigger("open");
+        } else {
+          if (typeof data != 'undefined' && typeof data.error != 'undefined' && typeof data.error.message != 'undefined') alert(data.error.message);
+          this.close();
+        }
+        this.element.removeClass("ui-autocomplete-loading");
+      };
+      searchBox._normalize = function(data) {
+        // 미리 검증된 API 반환값을 autocomplete가 popdown에 표시하는 형식대로 전처리
+        return $.map(data.eventList, function(obj, index) {
+          return {label:obj.title, value:obj.eventUrl};
+        });
+      };
+    }
+  }
+});
+
+$.fn.extend({ reset: function() {
+  return this.each(function() {
+    $(this).is('form') && this.reset();
+  })
+}});
+
+
+/*------------------------------------------------------------------------------------------------*/
+/* 메인과 기본스킨에서 사용하는 이벤트 핸들러 */
+/*------------------------------------------------------------------------------------------------*/
+var handlerIssueOver = function(event) {
+  var element = this;
+  /* TODO: shade 같은 효과가 들어가야 하는데 그러면 위치 계산 시점이 어긋난다. 방법을 찾아볼 것. */
+  var tooltipObj = $(element).find('.wrapper').first().show();
+  tooltipObj.parent('.tooltip').show();
+  var tooltipWidth = tooltipObj.children('.left').outerWidth();
+  var filledWidth = $(element).find('.outerFilled,.filled').first().width();
+  tooltipObj.css('left', filledWidth - tooltipWidth - 2);
+}
+var handlerIssueOut = function(event) { $(this).find('.tooltip').first().hide(); }
+
+var handlerIconOver = function(event) {
+  var element = this;
+  if ($(element).hasClass('blank')) return false;
+  var wrapper = $(element);
+  var holder = $(element).closest('.holder');
+  var profile = holder.find('.profile')
+  profile.empty().append('<a class="inner">'+$(element).attr('alt')+'</a>');
+
+  var pos = $(element).position();
+  var unitWidth = $(element).outerWidth();
+  var unitHeight = $(element).outerHeight();
+  var gapWidth = 4; //동적으로 처리되는 경우가 생겨서 고정값 처리 필요 parseInt($(element).css('margin-right')); 
+  var gapHeight = parseInt($(element).css('margin-bottom'));
+
+  var borderCorrection = 4; // 2px * 2
+  var targetTop = pos.top;
+  var targetLeft = pos.left + unitWidth + gapWidth;
+  var innerWidth = profile.children('.inner').width();
+  var widthFactor = 6; //was Math.ceil(innerWidth/(unitWidth+gapWidth));
+  var targetWidth = unitWidth*widthFactor + gapWidth*(widthFactor-1) - borderCorrection;
+  var targetHeight = unitHeight - borderCorrection;
+  var targetRight = targetLeft + targetWidth;
+  var limitRight = holder.position().left + holder.outerWidth();
+  if (targetRight-11 > limitRight) { /* 영역 안에 들어가는 위치인데 왼쪽으로 빠지는 경우에 대한 보정. IE6이 11, 나머지는 7. */
+    targetLeft = pos.left - (gapWidth+targetWidth+borderCorrection);
+  }
+  
+  profile.width(targetWidth).height(targetHeight).css({'left':targetLeft,'top':targetTop})
+    //.stop(true,true).fadeIn('fast');
+    .show();
+  return false;
+}
+var handlerIconOut = function(event) {
+  var element = this;
+  var holder = $(element).closest('.holder');
+  var profile = holder.find('.profile')
+  profile
+  //$(element).children('.profile')
+    //.stop(true,true).fadeOut('slow');
+    .hide();
+  return false;
+}
+
+
+/* 개설자 관리 페이지용 */
+function addHoverClass(event) {
+  var element = $(this);
+  element.hasClass('detail') && element.addClass('detailHover');
+  element.hasClass('remove') && element.addClass('removeHover');
+}
+function removeHoverClass(event) {
+  var element = $(this);
+  element.hasClass('detail') && element.removeClass('detailHover');
+  element.hasClass('remove') && element.removeClass('removeHover');
+}
+
+
+
+//Jquery DatePicker 날짜처리를 위한 한국어 설정
+jQuery(function(a){
+  a.datepicker.regional.ko={closeText:"\ub2eb\uae30",prevText:"\uc774\uc804\ub2ec",nextText:"\ub2e4\uc74c\ub2ec",currentText:"\uc624\ub298",monthNames:["01","02","03","04","05","06","07","08","09","10","11","12"],monthNamesShort:["01","02","03","04","05","06","07","08","09","10","11","12"],dayNames:["\uc77c","\uc6d4","\ud654","\uc218","\ubaa9","\uae08","\ud1a0"],dayNamesShort:["\uc77c","\uc6d4","\ud654","\uc218","\ubaa9","\uae08","\ud1a0"],dayNamesMin:["\uc77c","\uc6d4","\ud654","\uc218","\ubaa9","\uae08","\ud1a0"],weekHeader:"Wk",dateFormat:"yy-mm-dd",firstDay:0,isRTL:false,showMonthAfterYear:true,yearSuffix:"."};
+  a.datepicker.setDefaults(a.datepicker.regional.ko)
+	/* Generate the HTML for the current state of the date picker. */
+  a.datepicker._generateHTML=function(inst) {
+		var today = new Date();
+		today = this._daylightSavingAdjust(
+			new Date(today.getFullYear(), today.getMonth(), today.getDate())); // clear time
+		var isRTL = this._get(inst, 'isRTL');
+		var showButtonPanel = this._get(inst, 'showButtonPanel');
+		var hideIfNoPrevNext = this._get(inst, 'hideIfNoPrevNext');
+		var navigationAsDateFormat = this._get(inst, 'navigationAsDateFormat');
+		var numMonths = this._getNumberOfMonths(inst);
+		var showCurrentAtPos = this._get(inst, 'showCurrentAtPos');
+		var stepMonths = this._get(inst, 'stepMonths');
+		var stepBigMonths = this._get(inst, 'stepBigMonths');
+		var isMultiMonth = (numMonths[0] != 1 || numMonths[1] != 1);
+		var currentDate = this._daylightSavingAdjust((!inst.currentDay ? new Date(9999, 9, 9) :
+			new Date(inst.currentYear, inst.currentMonth, inst.currentDay)));
+		var minDate = this._getMinMaxDate(inst, 'min');
+		var maxDate = this._getMinMaxDate(inst, 'max');
+		var drawMonth = inst.drawMonth - showCurrentAtPos;
+		var drawYear = inst.drawYear;
+		if (drawMonth < 0) {
+			drawMonth += 12;
+			drawYear--;
+		}
+		if (maxDate) {
+			var maxDraw = this._daylightSavingAdjust(new Date(maxDate.getFullYear(),
+				maxDate.getMonth() - (numMonths[0] * numMonths[1]) + 1, maxDate.getDate()));
+			maxDraw = (minDate && maxDraw < minDate ? minDate : maxDraw);
+			while (this._daylightSavingAdjust(new Date(drawYear, drawMonth, 1)) > maxDraw) {
+				drawMonth--;
+				if (drawMonth < 0) {
+					drawMonth = 11;
+					drawYear--;
+				}
+			}
+		}
+		inst.drawMonth = drawMonth;
+		inst.drawYear = drawYear;
+		var prevText = this._get(inst, 'prevText');
+		prevText = (!navigationAsDateFormat ? prevText : this.formatDate(prevText,
+			this._daylightSavingAdjust(new Date(drawYear, drawMonth - stepMonths, 1)),
+			this._getFormatConfig(inst)));
+		var prev = (this._canAdjustMonth(inst, -1, drawYear, drawMonth) ?
+			'<a class="ui-datepicker-prev ui-corner-all" onclick="jQuery.datepicker._adjustDate(\'#' + inst.id + '\', -' + stepMonths + ', \'M\');"' +
+			' title="' + prevText + '"><span class="ui-icon ui-icon-circle-triangle-' + ( isRTL ? 'e' : 'w') + '">' + prevText + '</span></a>' :
+			(hideIfNoPrevNext ? '' : '<a class="ui-datepicker-prev ui-corner-all ui-state-disabled" title="'+ prevText +'"><span class="ui-icon ui-icon-circle-triangle-' + ( isRTL ? 'e' : 'w') + '">' + prevText + '</span></a>'));
+		var nextText = this._get(inst, 'nextText');
+		nextText = (!navigationAsDateFormat ? nextText : this.formatDate(nextText,
+			this._daylightSavingAdjust(new Date(drawYear, drawMonth + stepMonths, 1)),
+			this._getFormatConfig(inst)));
+		var next = (this._canAdjustMonth(inst, +1, drawYear, drawMonth) ?
+			'<a class="ui-datepicker-next ui-corner-all" onclick="jQuery.datepicker._adjustDate(\'#' + inst.id + '\', +' + stepMonths + ', \'M\');"' +
+			' title="' + nextText + '"><span class="ui-icon ui-icon-circle-triangle-' + ( isRTL ? 'w' : 'e') + '">' + nextText + '</span></a>' :
+			(hideIfNoPrevNext ? '' : '<a class="ui-datepicker-next ui-corner-all ui-state-disabled" title="'+ nextText + '"><span class="ui-icon ui-icon-circle-triangle-' + ( isRTL ? 'w' : 'e') + '">' + nextText + '</span></a>'));
+		var prevBigText = this._get(inst, 'prevBigText');
+		prevBigText = (!navigationAsDateFormat ? prevBigText : this.formatDate(prevBigText,
+			this._daylightSavingAdjust(new Date(drawYear, drawMonth - stepMonths, 1)),
+			this._getFormatConfig(inst)));
+		var prevBig = (this._canAdjustMonth(inst, -1, drawYear, drawMonth) ?
+			'<a class="ui-datepicker-big-prev ui-corner-all" onclick="jQuery.datepicker._adjustDate(\'#' + inst.id + '\', -' + stepBigMonths + ', \'M\');"' +
+			' title="' + prevBigText + '"><span class="ui-icon ui-icon-circle-triangle-' + ( isRTL ? 'e' : 'w') + '">' + prevBigText + '</span></a>' :
+			(hideIfNoPrevNext ? '' : '<a class="ui-datepicker-big-prev ui-corner-all ui-state-disabled" title="'+ prevBigText +'"><span class="ui-icon ui-icon-circle-triangle-' + ( isRTL ? 'e' : 'w') + '">' + prevBigText + '</span></a>'));
+		var nextBigText = this._get(inst, 'nextBigText');
+		nextBigText = (!navigationAsDateFormat ? nextBigText : this.formatDate(nextBigText,
+			this._daylightSavingAdjust(new Date(drawYear, drawMonth + stepMonths, 1)),
+			this._getFormatConfig(inst)));
+		var nextBig = (this._canAdjustMonth(inst, +1, drawYear, drawMonth) ?
+			'<a class="ui-datepicker-big-next ui-corner-all" onclick="jQuery.datepicker._adjustDate(\'#' + inst.id + '\', +' + stepBigMonths + ', \'M\');"' +
+			' title="' + nextBigText + '"><span class="ui-icon ui-icon-circle-triangle-' + ( isRTL ? 'w' : 'e') + '">' + nextBigText + '</span></a>' :
+			(hideIfNoPrevNext ? '' : '<a class="ui-datepicker-big-next ui-corner-all ui-state-disabled" title="'+ nextBigText + '"><span class="ui-icon ui-icon-circle-triangle-' + ( isRTL ? 'w' : 'e') + '">' + nextBigText + '</span></a>'));
+		var currentText = this._get(inst, 'currentText');
+		var gotoDate = (this._get(inst, 'gotoCurrent') && inst.currentDay ? currentDate : today);
+		currentText = (!navigationAsDateFormat ? currentText :
+			this.formatDate(currentText, gotoDate, this._getFormatConfig(inst)));
+		var controls = (!inst.inline ? '<button type="button" class="ui-datepicker-close ui-state-default ui-priority-primary ui-corner-all" onclick="jQuery.datepicker._hideDatepicker();">' + this._get(inst, 'closeText') + '</button>' : '');
+		var buttonPanel = (showButtonPanel) ? '<div class="ui-datepicker-buttonpane ui-widget-content">' + (isRTL ? controls : '') +
+			(this._isInRange(inst, gotoDate) ? '<button type="button" class="ui-datepicker-current ui-state-default ui-priority-secondary ui-corner-all" onclick="jQuery.datepicker._gotoToday(\'#' + inst.id + '\');"' +
+			'>' + currentText + '</button>' : '') + (isRTL ? '' : controls) + '</div>' : '';
+		var firstDay = parseInt(this._get(inst, 'firstDay'),10);
+		firstDay = (isNaN(firstDay) ? 0 : firstDay);
+		var showWeek = this._get(inst, 'showWeek');
+		var dayNames = this._get(inst, 'dayNames');
+		var dayNamesShort = this._get(inst, 'dayNamesShort');
+		var dayNamesMin = this._get(inst, 'dayNamesMin');
+		var monthNames = this._get(inst, 'monthNames');
+		var monthNamesShort = this._get(inst, 'monthNamesShort');
+		var beforeShowDay = this._get(inst, 'beforeShowDay');
+		var showOtherMonths = this._get(inst, 'showOtherMonths');
+		var selectOtherMonths = this._get(inst, 'selectOtherMonths');
+		var calculateWeek = this._get(inst, 'calculateWeek') || this.iso8601Week;
+		var defaultDate = this._getDefaultDate(inst);
+		var html = '';
+		for (var row = 0; row < numMonths[0]; row++) {
+			var group = '';
+			for (var col = 0; col < numMonths[1]; col++) {
+				var selectedDate = this._daylightSavingAdjust(new Date(drawYear, drawMonth, inst.selectedDay));
+				var cornerClass = ' ui-corner-all';
+				var calender = '';
+				if (isMultiMonth) {
+					calender += '<div class="ui-datepicker-group';
+					if (numMonths[1] > 1)
+						switch (col) {
+							case 0: calender += ' ui-datepicker-group-first';
+								cornerClass = ' ui-corner-' + (isRTL ? 'right' : 'left'); break;
+							case numMonths[1]-1: calender += ' ui-datepicker-group-last';
+								cornerClass = ' ui-corner-' + (isRTL ? 'left' : 'right'); break;
+							default: calender += ' ui-datepicker-group-middle'; cornerClass = ''; break;
+						}
+					calender += '">';
+				}
+				calender += '<div class="ui-datepicker-header ui-widget-header ui-helper-clearfix' + cornerClass + '">' +
+					(/all|left/.test(cornerClass) && row == 0 ? (isRTL ? nextBig+next : prevBig+prev) : '') +
+					(/all|right/.test(cornerClass) && row == 0 ? (isRTL ? prev+prevBig : next+nextBig) : '') +
+					this._generateMonthYearHeader(inst, drawMonth, drawYear, minDate, maxDate,
+					row > 0 || col > 0, monthNames, monthNamesShort) + // draw month headers
+					'</div><table class="ui-datepicker-calendar"><thead>' +
+					'<tr>';
+				var thead = (showWeek ? '<th class="ui-datepicker-week-col">' + this._get(inst, 'weekHeader') + '</th>' : '');
+				for (var dow = 0; dow < 7; dow++) { // days of the week
+					var day = (dow + firstDay) % 7;
+					thead += '<th' + ((dow + firstDay + 6) % 7 >= 5 ? ' class="ui-datepicker-week-end"' : '') + '>' +
+						'<span title="' + dayNames[day] + '">' + dayNamesMin[day] + '</span></th>';
+				}
+				calender += thead + '</tr></thead><tbody>';
+				var daysInMonth = this._getDaysInMonth(drawYear, drawMonth);
+				if (drawYear == inst.selectedYear && drawMonth == inst.selectedMonth)
+					inst.selectedDay = Math.min(inst.selectedDay, daysInMonth);
+				var leadDays = (this._getFirstDayOfMonth(drawYear, drawMonth) - firstDay + 7) % 7;
+				var numRows = (isMultiMonth ? 6 : Math.ceil((leadDays + daysInMonth) / 7)); // calculate the number of rows to generate
+				var printDate = this._daylightSavingAdjust(new Date(drawYear, drawMonth, 1 - leadDays));
+				for (var dRow = 0; dRow < numRows; dRow++) { // create date picker rows
+					calender += '<tr>';
+					var tbody = (!showWeek ? '' : '<td class="ui-datepicker-week-col">' +
+						this._get(inst, 'calculateWeek')(printDate) + '</td>');
+					for (var dow = 0; dow < 7; dow++) { // create date picker days
+						var daySettings = (beforeShowDay ?
+							beforeShowDay.apply((inst.input ? inst.input[0] : null), [printDate]) : [true, '']);
+						var otherMonth = (printDate.getMonth() != drawMonth);
+						var unselectable = (otherMonth && !selectOtherMonths) || !daySettings[0] ||
+							(minDate && printDate < minDate) || (maxDate && printDate > maxDate);
+						tbody += '<td class="' +' ui-datepicker-week-'+((dow+firstDay+6)%7)+ /* XXX: 추가 부분 */
+							((dow + firstDay + 6) % 7 >= 5 ? ' ui-datepicker-week-end' : '') + // highlight weekends
+							(otherMonth ? ' ui-datepicker-other-month' : '') + // highlight days from other months
+							((printDate.getTime() == selectedDate.getTime() && drawMonth == inst.selectedMonth && inst._keyEvent) || // user pressed key
+							(defaultDate.getTime() == printDate.getTime() && defaultDate.getTime() == selectedDate.getTime()) ?
+							// or defaultDate is current printedDate and defaultDate is selectedDate
+							' ' + this._dayOverClass : '') + // highlight selected day
+							(unselectable ? ' ' + this._unselectableClass + ' ui-state-disabled': '') +  // highlight unselectable days
+							(otherMonth && !showOtherMonths ? '' : ' ' + daySettings[1] + // highlight custom dates
+							(printDate.getTime() == currentDate.getTime() ? ' ' + this._currentClass : '') + // highlight selected day
+							(printDate.getTime() == today.getTime() ? ' ui-datepicker-today' : '')) + '"' + // highlight today (if different)
+							((!otherMonth || showOtherMonths) && daySettings[2] ? ' title="' + daySettings[2] + '"' : '') + // cell title
+							(unselectable ? '' : ' onclick="jQuery.datepicker._selectDay(\'#' +
+							inst.id + '\',' + printDate.getMonth() + ',' + printDate.getFullYear() + ', this);return false;"') + '>' + // actions
+							(otherMonth && !showOtherMonths ? '&#xa0;' : // display for other months
+							(unselectable ? '<span class="ui-state-default">' + printDate.getDate() + '</span>' : '<a class="ui-state-default' +
+							(printDate.getTime() == today.getTime() ? ' ui-state-highlight' : '') +
+							(printDate.getTime() == currentDate.getTime() ? ' ui-state-active' : '') + // highlight selected day
+							(otherMonth ? ' ui-priority-secondary' : '') + // distinguish dates from other months
+							'" href="#">' + printDate.getDate() + '</a>')) + '</td>'; // display selectable date
+						printDate.setDate(printDate.getDate() + 1);
+						printDate = this._daylightSavingAdjust(printDate);
+					}
+					calender += tbody + '</tr>';
+				}
+				drawMonth++;
+				if (drawMonth > 11) {
+					drawMonth = 0;
+					drawYear++;
+				}
+				calender += '</tbody></table>' + (isMultiMonth ? '</div>' + 
+							((numMonths[0] > 0 && col == numMonths[1]-1) ? '<div class="ui-datepicker-row-break"></div>' : '') : '');
+				group += calender;
+			}
+			html += group;
+		}
+		html += buttonPanel + ($.browser.msie && parseInt($.browser.version,10) < 7 && !inst.inline ?
+			'<iframe src="javascript:false;" class="ui-datepicker-cover" frameborder="0"></iframe>' : '');
+		inst._keyEvent = false;
+		return html;
+	};
+	/* Generate the month and year header. */
+	a.datepicker._generateMonthYearHeader=function(inst, drawMonth, drawYear, minDate, maxDate, secondary, monthNames, monthNamesShort) {
+		var changeMonth = this._get(inst, 'changeMonth');
+		var changeYear = this._get(inst, 'changeYear');
+		var showMonthAfterYear = this._get(inst, 'showMonthAfterYear');
+		var html = '<div class="ui-datepicker-title">';
+		var monthHtml = '';
+		// month selection
+		if (secondary || !changeMonth)
+			monthHtml += '<span class="ui-datepicker-month">' + monthNames[drawMonth].toImage() + '</span>';
+		else {
+			var inMinYear = (minDate && minDate.getFullYear() == drawYear);
+			var inMaxYear = (maxDate && maxDate.getFullYear() == drawYear);
+			monthHtml += '<select class="ui-datepicker-month" ' +
+				'onchange="jQuery.datepicker._selectMonthYear(\'#' + inst.id + '\', this, \'M\');" ' +
+				'onclick="jQuery.datepicker._clickMonthYear(\'#' + inst.id + '\');"' +
+			 	'>';
+			for (var month = 0; month < 12; month++) {
+				if ((!inMinYear || month >= minDate.getMonth()) &&
+						(!inMaxYear || month <= maxDate.getMonth()))
+					monthHtml += '<option value="' + month + '"' +
+						(month == drawMonth ? ' selected="selected"' : '') +
+						'>' + monthNamesShort[month] + '</option>';
+			}
+			monthHtml += '</select>';
+		}
+		if (!showMonthAfterYear)
+			html += monthHtml + (secondary || !(changeMonth && changeYear) ? '&#xa0;' : '');
+		// year selection
+		inst.yearshtml = '';
+		if (secondary || !changeYear)
+			html += '<span class="ui-datepicker-year">' + drawYear.toImage() + '</span>';
+		else {
+			// determine range of years to display
+			var years = this._get(inst, 'yearRange').split(':');
+			var thisYear = new Date().getFullYear();
+			var determineYear = function(value) {
+				var year = (value.match(/c[+-].*/) ? drawYear + parseInt(value.substring(1), 10) :
+					(value.match(/[+-].*/) ? thisYear + parseInt(value, 10) :
+					parseInt(value, 10)));
+				return (isNaN(year) ? thisYear : year);
+			};
+			var year = determineYear(years[0]);
+			var endYear = Math.max(year, determineYear(years[1] || ''));
+			year = (minDate ? Math.max(year, minDate.getFullYear()) : year);
+			endYear = (maxDate ? Math.min(endYear, maxDate.getFullYear()) : endYear);
+			inst.yearshtml += '<select class="ui-datepicker-year" ' +
+				'onchange="jQuery.datepicker._selectMonthYear(\'#' + inst.id + '\', this, \'Y\');" ' +
+				'onclick="jQuery.datepicker._clickMonthYear(\'#' + inst.id + '\');"' +
+				'>';
+			for (; year <= endYear; year++) {
+				inst.yearshtml += '<option value="' + year + '"' +
+					(year == drawYear ? ' selected="selected"' : '') +
+					'>' + year + '</option>';
+			}
+			inst.yearshtml += '</select>';
+			//when showing there is no need for later update
+			if( ! $.browser.mozilla ){
+				html += inst.yearshtml;
+				inst.yearshtml = null;
+			} else {
+				// will be replaced later with inst.yearshtml
+				html += '<select class="ui-datepicker-year"><option value="' + drawYear + '" selected="selected">' + drawYear + '</option></select>';
+			}
+		}
+		html += this._get(inst, 'yearSuffix').toImage();
+		if (showMonthAfterYear)
+			html += (secondary || !(changeMonth && changeYear) ? '&#xa0;' : '') + monthHtml;
+		html += '</div>'; // Close datepicker_header
+		return html;
+	};
+});
+
+
+/*------------------------------------------------------------------------------------------------*/
+/* Util */
+/*------------------------------------------------------------------------------------------------*/
+
+/* 쿠키값을 가져올때 사용 */
+function getCookie (name) {
+  var nameOfCookie = name + "=";
+  var x = 0;
+  while ( x <= document.cookie.length )
+  {
+          var y = (x+nameOfCookie.length);
+          if ( document.cookie.substring( x, y ) == nameOfCookie ) {
+                  if ( (endOfCookie=document.cookie.indexOf( ";", y )) == -1 )
+                          endOfCookie = document.cookie.length;
+                  return unescape( document.cookie.substring( y, endOfCookie ) );
+          }
+          x = document.cookie.indexOf( " ", x ) + 1;
+          if ( x == 0 )
+                  break;
+  }
+  return "";
+}
+
+/* 쿠키값을 설정할때 사용 */
+function setCookie (name, value, expiredays) {
+  var todayDate = new Date();
+  todayDate.setDate( todayDate.getDate() + expiredays );
+  document.cookie = name + "=" + escape( value ) + "; path=/; expires=" + todayDate.toGMTString() + ";"
+}
+
+// IE에서 클립보드로 복사. 플래시로 대체됨
+function copyToClipboard(sender) {
+  if (!window.clipboardData) return false;
+  if (sender.value != undefined) {
+    window.clipboardData.setData('text',sender.value); // 폼 요소
+  } else if (sender.innerText != undefined) {
+    window.clipboardData.setData('text',sender.innerText); // 일반 요소
+  } else {
+    return;
+  }
+  alert("클립보드로 복사 되었습니다.");
+} 
+
+// http://phpjs.org/functions/isset:454
+function isset () {
+    // *     example 1: isset( undefined, true);
+    // *     returns 1: false
+    // *     example 2: isset( 'Kevin van Zonneveld' );
+    // *     returns 2: true
+    
+    var a = arguments, l = a.length, i = 0, undef;
+    
+    if (l === 0) {
+        throw new Error('Empty isset'); 
+    }
+    
+    while (i !== l) {
+        if (a[i] === undef || a[i] === null) {
+            return false; 
+        }
+        i++; 
+    }
+    return true;
+}
+
+// http://phpjs.org/functions/implode:430
+function implode (glue, pieces) {
+    // *     example 1: implode(' ', ['Kevin', 'van', 'Zonneveld']);
+    // *     returns 1: 'Kevin van Zonneveld'
+    // *     example 2: implode(' ', {first:'Kevin', last: 'van Zonneveld'});
+    // *     returns 2: 'Kevin van Zonneveld'
+
+    var i = '', retVal='', tGlue='';
+    if (arguments.length === 1) {
+        pieces = glue;
+        glue = '';
+    }
+    if (typeof(pieces) === 'object') {
+        if (pieces instanceof Array) {
+            return pieces.join(glue);
+        }
+        else {
+            for (i in pieces) {
+                retVal += tGlue + pieces[i];
+                tGlue = glue;
+            }
+            return retVal;
+        }
+    }
+    else {
+        return pieces;
+    }
+}
+
+// http://phpjs.org/functions/echo:391
+function echo () {
+    // %        note 1: If browsers start to support DOM Level 3 Load and Save (parsing/serializing),
+    // %        note 1: we wouldn't need any such long code (even most of the code below). See
+    // %        note 1: link below for a cross-browser implementation in JavaScript. HTML5 might
+    // %        note 1: possibly support DOMParser, but that is not presently a standard.
+    // %        note 2: Although innerHTML is widely used and may become standard as of HTML5, it is also not ideal for
+    // %        note 2: use with a temporary holder before appending to the DOM (as is our last resort below),
+    // %        note 2: since it may not work in an XML context
+    // %        note 3: Using innerHTML to directly add to the BODY is very dangerous because it will
+    // %        note 3: break all pre-existing references to HTMLElements.
+    // *     example 1: echo('<div><p>abc</p><p>abc</p></div>');
+    // *     returns 1: undefined
+
+    var arg = '', argc = arguments.length, argv = arguments, i = 0, holder,
+        win = this.window,
+        d = win.document,
+        ns_xhtml = 'http://www.w3.org/1999/xhtml',
+        ns_xul = 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul'; // If we're in a XUL context
+
+    var stringToDOM = function (str, parent, ns, container) {
+        var extraNSs = '';
+        if (ns === ns_xul) {
+            extraNSs = ' xmlns:html="' + ns_xhtml + '"';
+        }
+        var stringContainer = '<' + container + ' xmlns="' + ns + '"' + extraNSs + '>' + str + '</'+container+'>';
+        var dils = win.DOMImplementationLS, dp = win.DOMParser, ax = win.ActiveXObject;
+        if (dils && dils.createLSInput && dils.createLSParser) {
+            // Follows the DOM 3 Load and Save standard, but not
+            // implemented in browsers at present; HTML5 is to standardize on innerHTML, but not for XML (though
+            // possibly will also standardize with DOMParser); in the meantime, to ensure fullest browser support, could
+            // attach http://svn2.assembla.com/svn/brettz9/DOMToString/DOM3.js (see http://svn2.assembla.com/svn/brettz9/DOMToString/DOM3.xhtml for a simple test file)
+            var lsInput = dils.createLSInput();
+            // If we're in XHTML, we'll try to allow the XHTML namespace to be available by default
+            lsInput.stringData = stringContainer;
+            var lsParser = dils.createLSParser(1, null); // synchronous, no schema type
+            return lsParser.parse(lsInput).firstChild;
+        }
+        else if (dp) {
+            // If we're in XHTML, we'll try to allow the XHTML namespace to be available by default
+            try {
+                var fc = new dp().parseFromString(stringContainer, 'text/xml');
+                if (fc && fc.documentElement &&
+                        fc.documentElement.localName !== 'parsererror' &&
+                        fc.documentElement.namespaceURI !== 'http://www.mozilla.org/newlayout/xml/parsererror.xml') {
+                    return fc.documentElement.firstChild;
+                }
+                // If there's a parsing error, we just continue on
+            }
+            catch(e) {
+                // If there's a parsing error, we just continue on
+            }
+        }
+        else if (ax) { // We don't bother with a holder in Explorer as it doesn't support namespaces
+            var axo = new ax('MSXML2.DOMDocument');
+            axo.loadXML(str);
+            return axo.documentElement;
+        }
+        /*else if (win.XMLHttpRequest) { // Supposed to work in older Safari
+            var req = new win.XMLHttpRequest;
+            req.open('GET', 'data:application/xml;charset=utf-8,'+encodeURIComponent(str), false);
+            if (req.overrideMimeType) {
+                req.overrideMimeType('application/xml');
+            }
+            req.send(null);
+            return req.responseXML;
+        }*/
+        // Document fragment did not work with innerHTML, so we create a temporary element holder
+        // If we're in XHTML, we'll try to allow the XHTML namespace to be available by default
+        //if (d.createElementNS && (d.contentType && d.contentType !== 'text/html')) { // Don't create namespaced elements if we're being served as HTML (currently only Mozilla supports this detection in true XHTML-supporting browsers, but Safari and Opera should work with the above DOMParser anyways, and IE doesn't support createElementNS anyways)
+        if (d.createElementNS &&  // Browser supports the method
+            (d.documentElement.namespaceURI || // We can use if the document is using a namespace
+            d.documentElement.nodeName.toLowerCase() !== 'html' || // We know it's not HTML4 or less, if the tag is not HTML (even if the root namespace is null)
+            (d.contentType && d.contentType !== 'text/html') // We know it's not regular HTML4 or less if this is Mozilla (only browser supporting the attribute) and the content type is something other than text/html; other HTML5 roots (like svg) still have a namespace
+        )) { // Don't create namespaced elements if we're being served as HTML (currently only Mozilla supports this detection in true XHTML-supporting browsers, but Safari and Opera should work with the above DOMParser anyways, and IE doesn't support createElementNS anyways); last test is for the sake of being in a pure XML document
+            holder = d.createElementNS(ns, container);
+        }
+        else {
+            holder = d.createElement(container); // Document fragment did not work with innerHTML
+        }
+        holder.innerHTML = str;
+        while (holder.firstChild) {
+            parent.appendChild(holder.firstChild);
+        }
+        return false;
+        // throw 'Your browser does not support DOM parsing as required by echo()';
+    };
+
+
+    var ieFix = function (node) {
+        if (node.nodeType === 1) {
+            var newNode = d.createElement(node.nodeName);
+            var i, len;
+            if (node.attributes && node.attributes.length > 0) {
+                for (i = 0, len = node.attributes.length; i < len; i++) {
+                    newNode.setAttribute(node.attributes[i].nodeName, node.getAttribute(node.attributes[i].nodeName));
+                }
+            }
+            if (node.childNodes && node.childNodes.length > 0) {
+                for (i = 0, len = node.childNodes.length; i < len; i++) {
+                    newNode.appendChild(ieFix(node.childNodes[i]));
+                }
+            }
+            return newNode;
+        }
+        else {
+            return d.createTextNode(node.nodeValue);
+        }
+    };
+
+    var replacer = function (s, m1, m2) {
+        // We assume for now that embedded variables do not have dollar sign; to add a dollar sign, you currently must use {$$var} (We might change this, however.)
+        // Doesn't cover all cases yet: see http://php.net/manual/en/language.types.string.php#language.types.string.syntax.double
+        if (m1 !== '\\') {
+            return m1 + eval(m2);
+        }
+        else {
+            return s;
+        }
+    };
+
+    for (i = 0; i < argc; i++ ) {
+        arg = argv[i];
+        if (this.php_js && this.php_js.ini && this.php_js.ini['phpjs.echo_embedded_vars']) {
+            arg = arg.replace(/(.?)\{\$(.*?)\}/g, replacer);
+        }
+        if (d.appendChild) {
+            if (d.body) {
+                if (win.navigator.appName === 'Microsoft Internet Explorer') { // We unfortunately cannot use feature detection, since this is an IE bug with cloneNode nodes being appended
+                    d.body.appendChild(stringToDOM(ieFix(arg)));
+                }
+                else {
+                    var unappendedLeft = stringToDOM(arg, d.body, ns_xhtml, 'div').cloneNode(true); // We will not actually append the div tag (just using for providing XHTML namespace by default)
+                    if (unappendedLeft) {
+                        d.body.appendChild(unappendedLeft);
+                    }
+                }
+            } else {
+                d.documentElement.appendChild(stringToDOM(arg, d.documentElement, ns_xul, 'description')); // We will not actually append the description tag (just using for providing XUL namespace by default)
+            }
+        } else if (d.write) {
+            d.write(arg);
+        }/* else { // This could recurse if we ever add print!
+            print(arg);
+        }*/
+    }
+}
+
+// http://phpjs.org/functions/var_dump:604
+function var_dump () {
+    // -    depends on: echo
+    // %        note 1: For returning a string, use var_export() with the second argument set to true
+    // *     example 1: var_dump(1);
+    // *     returns 1: 'int(1)'
+
+    var output = '', pad_char = ' ', pad_val = 4, lgth = 0, i = 0, d = this.window.document;
+    var _getFuncName = function (fn) {
+        var name = (/\W*function\s+([\w\$]+)\s*\(/).exec(fn);
+        if (!name) {
+            return '(Anonymous)';
+        }
+        return name[1];
+    };
+
+    var _repeat_char = function (len, pad_char) {
+        var str = '';
+        for (var i = 0; i < len; i++) {
+            str += pad_char;
+        }
+        return str;
+    };
+    var _getInnerVal = function (val, thick_pad) {
+        var ret = '';
+        if (val === null) {
+            ret = 'NULL';
+        }
+        else if (typeof val === 'boolean') {
+            ret = 'bool(' + val + ')';
+        }
+        else if (typeof val === 'string') {
+            ret = 'string(' + val.length+') "' + val + '"';
+        }
+        else if (typeof val === 'number') {
+            if (parseFloat(val) == parseInt(val, 10)) {
+                ret = 'int(' + val + ')';
+            }
+            else {
+                ret = 'float('+val+')';
+            }
+        }
+        // The remaining are not PHP behavior because these values only exist in this exact form in JavaScript
+        else if (typeof val === 'undefined') {
+            ret = 'undefined';
+        }
+        else if (typeof val === 'function') {
+            var funcLines = val.toString().split('\n');
+            ret = '';
+            for (var i = 0, fll = funcLines.length; i < fll; i++) {
+                ret += (i !== 0 ? '\n'+thick_pad : '') + funcLines[i];
+            }
+        }
+        else if (val instanceof Date) {
+            ret = 'Date('+val+')';
+        }
+        else if (val instanceof RegExp) {
+            ret = 'RegExp('+val+')';
+        }
+        else if (val.nodeName) { // Different than PHP's DOMElement
+            switch(val.nodeType) {
+                case 1:
+                    if (typeof val.namespaceURI === 'undefined' || val.namespaceURI === 'http://www.w3.org/1999/xhtml') { // Undefined namespace could be plain XML, but namespaceURI not widely supported
+                        ret = 'HTMLElement("' + val.nodeName + '")';
+                    }
+                    else {
+                        ret = 'XML Element("' + val.nodeName + '")';
+                    }
+                    break;
+                case 2:
+                    ret = 'ATTRIBUTE_NODE(' + val.nodeName + ')';
+                    break;
+                case 3:
+                    ret = 'TEXT_NODE(' + val.nodeValue + ')';
+                    break;
+                case 4:
+                    ret = 'CDATA_SECTION_NODE(' + val.nodeValue + ')';
+                    break;
+                case 5:
+                    ret = 'ENTITY_REFERENCE_NODE';
+                    break;
+                case 6:
+                    ret = 'ENTITY_NODE';
+                    break;
+                case 7:
+                    ret = 'PROCESSING_INSTRUCTION_NODE(' + val.nodeName + ':' + val.nodeValue+')';
+                    break;
+                case 8:
+                    ret = 'COMMENT_NODE(' + val.nodeValue + ')';
+                    break;
+                case 9:
+                    ret = 'DOCUMENT_NODE';
+                    break;
+                case 10:
+                    ret = 'DOCUMENT_TYPE_NODE';
+                    break;
+                case 11:
+                    ret = 'DOCUMENT_FRAGMENT_NODE';
+                    break;
+                case 12:
+                    ret = 'NOTATION_NODE';
+                    break;
+            }
+        }
+        return ret;
+    };
+
+    var _formatArray = function (obj, cur_depth, pad_val, pad_char) {
+        var someProp = '';
+        if (cur_depth > 0) {
+            cur_depth++;
+        }
+
+        var base_pad = _repeat_char(pad_val * (cur_depth - 1), pad_char);
+        var thick_pad = _repeat_char(pad_val * (cur_depth + 1), pad_char);
+        var str = '';
+        var val = '';
+
+        if (typeof obj === 'object' && obj !== null) {
+            if (obj.constructor && _getFuncName(obj.constructor) === 'PHPJS_Resource') {
+                return obj.var_dump();
+            }
+            lgth = 0;
+            for (someProp in obj) {
+                lgth++;
+            }
+            str += 'array('+lgth+') {\n';
+            for (var key in obj) {
+                var objVal = obj[key];
+                if (typeof objVal === 'object' && objVal !== null &&
+                    !(objVal instanceof Date) && !(objVal instanceof RegExp) && !objVal.nodeName) {
+                    str += thick_pad + '[' + key + '] =>\n' + thick_pad + _formatArray(objVal, cur_depth + 1, pad_val, pad_char);
+                } else {
+                    val = _getInnerVal(objVal, thick_pad);
+                    str += thick_pad + '[' + key + '] =>\n' + thick_pad + val + '\n';
+                }
+            }
+            str += base_pad + '}\n';
+        } else {
+            str = _getInnerVal(obj, thick_pad);
+        }
+        return str;
+    };
+
+    output = _formatArray(arguments[0], 0, pad_val, pad_char);
+    for (i=1; i < arguments.length; i++) {
+        output += '\n' + _formatArray(arguments[i], 0, pad_val, pad_char);
+    }
+
+    if (d.body) {
+        this.echo(output);
+    }
+    else {
+        try {
+            d = XULDocument; // We're in XUL, so appending as plain text won't work
+            this.echo('<pre xmlns="http://www.w3.org/1999/xhtml" style="white-space:pre;">'+output+'</pre>');
+        }
+        catch (e) {
+            this.echo(output); // Outputting as plain text may work in some plain XML
+        }
+    }
+}
+
+/*------------------------------------------------------------------------------------------------*/
+/* Date/Time */
+/*------------------------------------------------------------------------------------------------*/
+
+function _whatDay(val, type) {
+  if (typeof type=='undefined') type='hs';
+  if (type=='hs') {
+    // 한글 짧게
+    switch (val) {
+      case 0 : return '일'; break;
+      case 1 : return '월'; break;
+      case 2 : return '화'; break;
+      case 3 : return '수'; break;
+      case 4 : return '목'; break;
+      case 5 : return '금'; break;
+      case 6 : return '토'; break;
+      default : return 'none';
+    }
+  } else if (type=='hl') {
+    switch (val) {
+      case 0 : return '일요일'; break;
+      case 1 : return '월요일'; break;
+      case 2 : return '화요일'; break;
+      case 3 : return '수요일'; break;
+      case 4 : return '목요일'; break;
+      case 5 : return '금요일'; break;
+      case 6 : return '토요일'; break;
+      default : return 'none';
+    }
+  } else {
+    return 'none';
+  }
+}
+
+// http://phpjs.org/functions/getdate:420
+function getdate (timestamp) {
+    // *     example 1: getdate(1055901520);
+    // *     returns 1: {'seconds': 40, 'minutes': 58, 'hours': 21, 'mday': 17, 'wday': 2, 'mon': 6, 'year': 2003, 'yday': 167, 'weekday': 'Tuesday', 'month': 'June', '0': 1055901520}
+
+    var _w = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    var _m = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    var d=(
+        (typeof(timestamp) == 'undefined') ? new Date() : // Not provided
+        (typeof(timestamp) == 'object') ? new Date(timestamp) : // Javascript Date()
+        new Date(timestamp*1000) // UNIX timestamp (auto-convert to int)
+    );
+    var w = d.getDay();
+    var m = d.getMonth();
+    var y = d.getFullYear();
+    var r = {};
+
+    r.seconds = d.getSeconds();
+    r.minutes = d.getMinutes();
+    r.hours = d.getHours();
+    r.mday = d.getDate();
+    r.wday = w;
+    r.mon = m + 1;
+    r.year = y;
+    r.yday = Math.floor((d - (new Date(y, 0, 1))) / 86400000);
+    r.weekday = _w[w];
+    r.month = _m[m];
+    r['0'] = parseInt(d.getTime() / 1000, 10);
+
+    return r;
+}
+
+// http://phpjs.org/functions/strtotime:554
+function strtotime (str, now) {
+    // %        note 1: Examples all have a fixed timestamp to prevent tests to fail because of variable time(zones)
+    // *     example 1: strtotime('+1 day', 1129633200);
+    // *     returns 1: 1129719600
+    // *     example 2: strtotime('+1 week 2 days 4 hours 2 seconds', 1129633200);
+    // *     returns 2: 1130425202
+    // *     example 3: strtotime('last month', 1129633200);
+    // *     returns 3: 1127041200
+    // *     example 4: strtotime('2009-05-04 08:30:00');
+    // *     returns 4: 1241418600
+ 
+    var i, match, s, strTmp = '', parse = '';
+    // 빈 문자열이거나 숫자형인데 값이 없으면 0으로 처리
+    if (str == null || (is_numeric(str) && isNaN(str))) {return 0;}
+
+    strTmp = str;
+    strTmp = strTmp.replace(/\s{2,}|^\s|\s$/g, ' '); // unecessary spaces
+    strTmp = strTmp.replace(/[\t\r\n]/g, ''); // unecessary chars
+    if (strTmp == 'now') {
+        return (new Date()).getTime()/1000; // Return seconds, not milli-seconds
+    } else if (!isNaN(parse = Date.parse(strTmp))) {
+        return (parse/1000);
+    } else if (now) {
+        now = new Date(now*1000); // Accept PHP-style seconds
+    } else {
+        now = new Date();
+    }
+    strTmp = strTmp.toLowerCase();
+
+    var __is = {
+        day: { 'sun': 0, 'mon': 1, 'tue': 2, 'wed': 3, 'thu': 4, 'fri': 5, 'sat': 6 },
+        mon: { 'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3, 'may': 4, 'jun': 5, 'jul': 6, 'aug': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dec': 11 }
+    };
+
+    var process = function (m) {
+        var ago = (m[2] && m[2] == 'ago');
+        var num = (num = m[0] == 'last' ? -1 : 1) * (ago ? -1 : 1);
+
+        switch (m[0]) {
+            case 'last':
+            case 'next':
+                switch (m[1].substring(0, 3)) {
+                    case 'yea':
+                        now.setFullYear(now.getFullYear() + num); break;
+                    case 'mon':
+                        now.setMonth(now.getMonth() + num); break;  
+                    case 'wee':
+                        now.setDate(now.getDate() + (num * 7)); break;
+                    case 'day':
+                        now.setDate(now.getDate() + num); break;
+                    case 'hou':
+                        now.setHours(now.getHours() + num); break;
+                    case 'min':
+                        now.setMinutes(now.getMinutes() + num); break;
+                    case 'sec':
+                        now.setSeconds(now.getSeconds() + num); break;
+                    default:
+                        var day;
+                        if (typeof (day = __is.day[m[1].substring(0, 3)]) != 'undefined') {
+                            var diff = day - now.getDay();
+                            if (diff == 0) {
+                                diff = 7 * num;
+                            } else if (diff > 0) {
+                                if (m[0] == 'last') {diff -= 7;}
+                            } else {
+                                if (m[0] == 'next') {diff += 7;}
+                            }
+                            now.setDate(now.getDate() + diff);
+                        }
+                }
+                break;
+
+            default:
+                if (/\d+/.test(m[0])) {
+                    num *= parseInt(m[0], 10);
+
+                    switch (m[1].substring(0, 3)) {
+                        case 'yea':
+                            now.setFullYear(now.getFullYear() + num); break;
+                        case 'mon':
+                            now.setMonth(now.getMonth() + num); break;
+                        case 'wee':
+                            now.setDate(now.getDate() + (num * 7)); break;
+                        case 'day':
+                            now.setDate(now.getDate() + num); break;
+                        case 'hou':
+                            now.setHours(now.getHours() + num); break;
+                        case 'min':
+                            now.setMinutes(now.getMinutes() + num); break;
+                        case 'sec':
+                            now.setSeconds(now.getSeconds() + num); break;
+                    }
+                } else {
+                    return false;
+                }
+                break;
+        }
+        return true;
+    };
+
+    match = strTmp.match(/^(\d{2,4}-\d{2}-\d{2})(?:\s(\d{1,2}:\d{2}(:\d{2})?)?(?:\.(\d+))?)?$/);
+    if (match != null) {
+        if (!match[2]) {
+            match[2] = '00:00:00';
+        } else if (!match[3]) {
+            match[2] += ':00';
+        }
+
+        s = match[1].split(/-/g);
+        for (i in __is.mon) { if (__is.mon[i] == s[1] - 1) { s[1] = i; } }
+        s[0] = parseInt(s[0], 10);
+        s[0] = (s[0] >= 0 && s[0] <= 69) ? '20'+(s[0] < 10 ? '0'+s[0] : s[0]+'') : (s[0] >= 70 && s[0] <= 99) ? '19'+s[0] : s[0]+'';
+        return parseInt(this.strtotime(s[2] + ' ' + s[1] + ' ' + s[0] + ' ' + match[2])+(match[4] ? match[4]/1000 : ''), 10);
+    }
+
+    var regex = '([+-]?\\d+\\s'+
+        '(years?|months?|weeks?|days?|hours?|min|minutes?|sec|seconds?'+
+        '|sun\\.?|sunday|mon\\.?|monday|tue\\.?|tuesday|wed\\.?|wednesday'+
+        '|thu\\.?|thursday|fri\\.?|friday|sat\\.?|saturday)'+
+        '|(last|next)\\s'+
+        '(years?|months?|weeks?|days?|hours?|min|minutes?|sec|seconds?'+
+        '|sun\\.?|sunday|mon\\.?|monday|tue\\.?|tuesday|wed\\.?|wednesday'+
+        '|thu\\.?|thursday|fri\\.?|friday|sat\\.?|saturday))'+
+        '(\\sago)?';
+
+    match = strTmp.match(new RegExp(regex, 'gi')); // Brett: seems should be case insensitive per docs, so added 'i'
+    if (match == null) { return false; }
+    for (i = 0; i < match.length; i++) { if (!process(match[i].split(' '))) { return false; } }
+
+    return (now.getTime()/1000);
+}
+
+// http://phpjs.org/functions/time:562
+function time () {
+    // *     example 1: timeStamp = time();
+    // *     results 1: timeStamp > 1000000000 && timeStamp < 2000000000
+    return Math.floor(new Date().getTime()/1000);
+}
+
+// http://phpjs.org/functions/is_string:453
+function is_string (mixed_var) {
+    // Returns true if variable is a Unicode or binary string  
+    // *     example 1: is_string('23');
+    // *     returns 1: true
+    // *     example 2: is_string(23.5);
+    // *     returns 2: false
+    return (typeof( mixed_var ) == 'string');
+}
+
+// http://phpjs.org/functions/is_numeric:449
+function is_numeric (mixed_var) {
+    // Returns true if value is a number or a numeric string  
+    // *     example 1: is_numeric(186.31);
+    // *     returns 1: true
+    // *     example 2: is_numeric('Kevin van Zonneveld');
+    // *     returns 2: false
+    // *     example 3: is_numeric('+186.31e2');
+    // *     returns 3: true
+    // *     example 4: is_numeric('');
+    // *     returns 4: false
+    // *     example 4: is_numeric([]);
+    // *     returns 4: false
+    return (typeof(mixed_var) === 'number' || typeof(mixed_var) === 'string') && mixed_var !== '' && !isNaN(mixed_var);
+}
+
+function date (format, timestamp) {
+    // http://kevin.vanzonneveld.net
+    // %        note 1: Uses global: php_js to store the default timezone
+    // %        note 2: Although the function potentially allows timezone info (see notes), it currently does not set
+    // %        note 2: per a timezone specified by date_default_timezone_set(). Implementers might use
+    // %        note 2: this.php_js.currentTimezoneOffset and this.php_js.currentTimezoneDST set by that function
+    // %        note 2: in order to adjust the dates in this function (or our other date functions!) accordingly
+    // *     example 1: date('H:m:s \\m \\i\\s \\m\\o\\n\\t\\h', 1062402400);
+    // *     returns 1: '09:09:40 m is month'
+    // *     example 2: date('F j, Y, g:i a', 1062462400);
+    // *     returns 2: 'September 2, 2003, 2:26 am'
+    // *     example 3: date('Y W o', 1062462400);
+    // *     returns 3: '2003 36 2003'
+    // *     example 4: x = date('Y m d', (new Date()).getTime()/1000); 
+    // *     example 4: (x+'').length == 10 // 2009 01 09
+    // *     returns 4: true
+    // *     example 5: date('W', 1104534000);
+    // *     returns 5: '53'
+    // *     example 6: date('B t', 1104534000);
+    // *     returns 6: '999 31'
+    // *     example 7: date('W U', 1293750000.82); // 2010-12-31
+    // *     returns 7: '52 1293750000'
+    // *     example 8: date('W', 1293836400); // 2011-01-01
+    // *     returns 8: '52'
+    // *     example 9: date('W Y-m-d', 1293974054); // 2011-01-02
+    // *     returns 9: '52 2011-01-02'
+    var that = this,
+        jsdate, f, formatChr = /\\?([a-z])/gi,
+        formatChrCb,
+        // Keep this here (works, but for code commented-out
+        // below for file size reasons)
+        //, tal= [],
+        _pad = function (n, c) {
+            if ((n = n + '').length < c) {
+                return new Array((++c) - n.length).join('0') + n;
+            }
+            return n;
+        },
+        txt_words = ["Sun", "Mon", "Tues", "Wednes", "Thurs", "Fri", "Satur", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    formatChrCb = function (t, s) {
+        return f[t] ? f[t]() : s;
+    };
+    f = {
+        // Day
+        d: function () { // Day of month w/leading 0; 01..31
+            return _pad(f.j(), 2);
+        },
+        D: function () { // Shorthand day name; Mon...Sun
+            return f.l().slice(0, 3);
+        },
+        j: function () { // Day of month; 1..31
+            return jsdate.getDate();
+        },
+        l: function () { // Full day name; Monday...Sunday
+            return txt_words[f.w()] + 'day';
+        },
+        N: function () { // ISO-8601 day of week; 1[Mon]..7[Sun]
+            return f.w() || 7;
+        },
+        S: function () { // Ordinal suffix for day of month; st, nd, rd, th
+            var j = f.j();
+            return j < 4 | j > 20 && ['st', 'nd', 'rd'][j%10 - 1] || 'th'; 
+        },
+        w: function () { // Day of week; 0[Sun]..6[Sat]
+            return jsdate.getDay();
+        },
+        z: function () { // Day of year; 0..365
+            var a = new Date(f.Y(), f.n() - 1, f.j()),
+                b = new Date(f.Y(), 0, 1);
+            return Math.round((a - b) / 864e5) + 1;
+        },
+
+        // Week
+        W: function () { // ISO-8601 week number
+            var a = new Date(f.Y(), f.n() - 1, f.j() - f.N() + 3),
+                b = new Date(a.getFullYear(), 0, 4);
+            return _pad(1 + Math.round((a - b) / 864e5 / 7), 2);
+        },
+
+        // Month
+        F: function () { // Full month name; January...December
+            return txt_words[6 + f.n()];
+        },
+        m: function () { // Month w/leading 0; 01...12
+            return _pad(f.n(), 2);
+        },
+        M: function () { // Shorthand month name; Jan...Dec
+            return f.F().slice(0, 3);
+        },
+        n: function () { // Month; 1...12
+            return jsdate.getMonth() + 1;
+        },
+        t: function () { // Days in month; 28...31
+            return (new Date(f.Y(), f.n(), 0)).getDate();
+        },
+
+        // Year
+        L: function () { // Is leap year?; 0 or 1
+            var j = f.Y();
+            return j%4==0 & j%100!=0 | j%400==0;
+        },
+        o: function () { // ISO-8601 year
+            var n = f.n(),
+                W = f.W(),
+                Y = f.Y();
+            return Y + (n === 12 && W < 9 ? -1 : n === 1 && W > 9);
+        },
+        Y: function () { // Full year; e.g. 1980...2010
+            return jsdate.getFullYear();
+        },
+        y: function () { // Last two digits of year; 00...99
+            return (f.Y() + "").slice(-2);
+        },
+
+        // Time
+        a: function () { // am or pm
+            return jsdate.getHours() > 11 ? "pm" : "am";
+        },
+        A: function () { // AM or PM
+            return f.a().toUpperCase();
+        },
+        B: function () { // Swatch Internet time; 000..999
+            var H = jsdate.getUTCHours() * 36e2,
+                // Hours
+                i = jsdate.getUTCMinutes() * 60,
+                // Minutes
+                s = jsdate.getUTCSeconds(); // Seconds
+            return _pad(Math.floor((H + i + s + 36e2) / 86.4) % 1e3, 3);
+        },
+        g: function () { // 12-Hours; 1..12
+            return f.G() % 12 || 12;
+        },
+        G: function () { // 24-Hours; 0..23
+            return jsdate.getHours();
+        },
+        h: function () { // 12-Hours w/leading 0; 01..12
+            return _pad(f.g(), 2);
+        },
+        H: function () { // 24-Hours w/leading 0; 00..23
+            return _pad(f.G(), 2);
+        },
+        i: function () { // Minutes w/leading 0; 00..59
+            return _pad(jsdate.getMinutes(), 2);
+        },
+        s: function () { // Seconds w/leading 0; 00..59
+            return _pad(jsdate.getSeconds(), 2);
+        },
+        u: function () { // Microseconds; 000000-999000
+            return _pad(jsdate.getMilliseconds() * 1000, 6);
+        },
+
+        // Timezone
+        e: function () { // Timezone identifier; e.g. Atlantic/Azores, ...
+            // The following works, but requires inclusion of the very large
+            // timezone_abbreviations_list() function.
+/*              return this.date_default_timezone_get();
+*/
+            throw 'Not supported (see source code of date() for timezone on how to add support)';
+        },
+        I: function () { // DST observed?; 0 or 1
+            // Compares Jan 1 minus Jan 1 UTC to Jul 1 minus Jul 1 UTC.
+            // If they are not equal, then DST is observed.
+            var a = new Date(f.Y(), 0),
+                // Jan 1
+                c = Date.UTC(f.Y(), 0),
+                // Jan 1 UTC
+                b = new Date(f.Y(), 6),
+                // Jul 1
+                d = Date.UTC(f.Y(), 6); // Jul 1 UTC
+            return 0 + ((a - c) !== (b - d));
+        },
+        O: function () { // Difference to GMT in hour format; e.g. +0200
+            var tzo = jsdate.getTimezoneOffset(),
+                a = Math.abs(tzo);
+            return (tzo > 0 ? "-" : "+") + _pad(Math.floor(a / 60) * 100 + a % 60, 4);
+        },
+        P: function () { // Difference to GMT w/colon; e.g. +02:00
+            var O = f.O();
+            return (O.substr(0, 3) + ":" + O.substr(3, 2));
+        },
+        T: function () { // Timezone abbreviation; e.g. EST, MDT, ...
+            // The following works, but requires inclusion of the very
+            // large timezone_abbreviations_list() function.
+/*              var abbr = '', i = 0, os = 0, default = 0;
+            if (!tal.length) {
+                tal = that.timezone_abbreviations_list();
+            }
+            if (that.php_js && that.php_js.default_timezone) {
+                default = that.php_js.default_timezone;
+                for (abbr in tal) {
+                    for (i=0; i < tal[abbr].length; i++) {
+                        if (tal[abbr][i].timezone_id === default) {
+                            return abbr.toUpperCase();
+                        }
+                    }
+                }
+            }
+            for (abbr in tal) {
+                for (i = 0; i < tal[abbr].length; i++) {
+                    os = -jsdate.getTimezoneOffset() * 60;
+                    if (tal[abbr][i].offset === os) {
+                        return abbr.toUpperCase();
+                    }
+                }
+            }
+*/
+            return 'UTC';
+        },
+        Z: function () { // Timezone offset in seconds (-43200...50400)
+            return -jsdate.getTimezoneOffset() * 60;
+        },
+
+        // Full Date/Time
+        c: function () { // ISO-8601 date.
+            return 'Y-m-d\\Th:i:sP'.replace(formatChr, formatChrCb);
+        },
+        r: function () { // RFC 2822
+            return 'D, d M Y H:i:s O'.replace(formatChr, formatChrCb);
+        },
+        U: function () { // Seconds since UNIX epoch
+            return jsdate / 1000 | 0;
+        }
+    };
+    this.date = function (format, timestamp) {
+        that = this;
+        jsdate = (timestamp == null ? new Date() : // Not provided
+        (timestamp instanceof Date) ? new Date(timestamp) : // JS Date()
+        new Date(timestamp * 1000) // UNIX timestamp (auto-convert to int)
+        );
+        return format.replace(formatChr, formatChrCb);
+    };
+    return this.date(format, timestamp);
+}
+
+function _agoDateTime(datetime, depth) {
+	if(typeof(depth) === "undefined")
+		depth = 7;
+
+	var now = time();
+
+	var src = strtotime(datetime);
+	if (src === false) return false;
+	var diff = now - src;
+
+	if (depth <= 1) return diff + '초전';
+	var parse = diff / 60; // 초->분
+	if (parse < 60 || depth <= 2) return parseInt(parse) + '분전';
+	parse = parse / 60; // 분->시
+	if (parse < 24 || depth <= 3) return parseInt(parse) + '시간전';
+	parse = parse / 24; // 시->일
+	if (parse < 24 || depth <= 4) return parseInt(parse) + '일전';
+	parse = parse / 7; //
+	if (parse < 5 || depth <= 5) return parseInt(parse) + '주전';
+	parse = parse / 4;
+	if (parse < 12 || depth <= 6) return parseInt(parse) + '개월전';
+	parse = parse / 12;
+	return parseInt(parse) + '년전';
+}
+
+// timestamp = 대상 시각
+// printEnding = 전/후 표시 여부
+// direction = true:과거가 전, false:과거가 후
+// now = 기준 시각
+function _relativeTime(timestamp, printEnding, direction, now) {
+  if (!is_numeric(timestamp)) timestamp = strtotime(timestamp);
+  if (typeof direction == 'undefined') direction = true;
+  if (typeof now == 'undefined') now = time();
+  var difference = now - timestamp;
+  // periods와 lengths에 각 decade, 10이 더 있었지만 대체할 표현도 없고 쓸 일도 없을 것 같아서 제외.
+  var periods = new Array("초","분","시간","일","주", "달", "년");
+  var lengths = new Array(     "60","60",  "24","7", "4.35","12");
+
+  if (difference >= 0) {
+    var ending = (direction?"전":"후");
+  } else {
+    difference = -difference;
+    var ending = (direction?"후":"전");
+  }
+  for(var j = 0; difference >= lengths[j]; j++)
+    difference /= lengths[j];
+  difference = Math.round(difference);
+  // 한국어에서는 불필요. if($difference != 1) $periods[$j].= "s";
+  var output = difference+periods[j];
+  if (printEnding != false) output = output+ending;
+  return output;
+}
+
+function _relativeTimeLong(timestamp, printEnding, direction, now) {
+  if (!is_numeric(timestamp)) timestamp = strtotime(timestamp);
+  if (typeof direction == 'undefined') direction = true;
+  if (typeof now == 'undefined' || !is_numeric(now)) now = time();
+  var difference = now - timestamp;
+  var _now = getdate(now);
+  var _then = getdate(timestamp);
+  var yday_diff = Math.abs(_now['yday']-_then['yday']);
+  if (difference >= 0) {
+    var ending = (direction?"전":"후");
+  } else {
+    difference = -difference;
+    var ending = (direction?"후":"전");
+  }
+
+  if (_now['year'] == _then['year'] && _now['yday'] == _then['yday']) {
+    // 같은 날짜일 때
+    var periods = new Array("초","분","시간");
+    var lengths = new Array(     "60",  "60");
+    for(var j = 0; difference >= lengths[j];) {
+      difference /= lengths[j++];
+      if (!isset(lengths[j])) break;
+    }
+    difference = Math.round(difference);
+    return difference+periods[j]+(printEnding===false?null:ending);
+  } else if (
+       (_now['year'] == _then['year'] && yday_diff <= 3)
+    || (_now['year'] != _then['year'] && yday_diff >= 362)
+  ) {
+    // 3일 이내 (연도 변경 조건에 우선함)
+    if (yday_diff == 1 || yday_diff == 364) {
+      return (now<timestamp?'내일':'어제')+date(' H시 i분',timestamp);
+    }
+    return (yday_diff>3?365-yday_diff:yday_diff)+'일'+ending+date(' H시 i분',timestamp);
+  } else if (_now['year'] == _then['year']) {
+    // 연도가 같을 경우
+    return date('n월 d일 G시 i분',timestamp);
+  } else {
+    // 연도가 다를 경우
+    return date('Y년 n월 d일 G시 i분',timestamp);
+  }
+}
+
+function _relativeTimespan(start, end, printYear, separator, isSuffixShort) {
+  if (is_string(start)) start = getdate(strtotime(start));
+  else if (is_numeric(start)) start = getdate(start);
+  else return false;
+  if (is_string(end)) end = getdate(strtotime(end));
+  else if (is_numeric(end)) end = getdate(end);
+  else return false;
+  if (printYear == undefined) printYear = true;
+  if (separator == undefined) separator = '~';
+  if (isSuffixShort) {
+    var suffix_hour = ':';
+    var suffix_minute = '';
+  } else {
+    var suffix_hour = '시';
+    var suffix_minute = '분';
+  }
+  var now = getdate();
+
+  if (printYear === false && now['year'] == start['year']) {
+    if (start['year'] == end['year']) delete end['year'];
+    delete start['year'];
+  }
+  // 시작과 종료에서 같은 경우 종료 부분을 출력에서 제외
+  else if (start['year'] == end['year']) {
+    if (now['year'] == start['year']) delete end['year'];
+  }
+
+  if ((start['mon'] == end['mon'])  && (start['mday'] == end['mday'])) { // 동일일자 처리
+    if (isset(end['year'])) delete end['year'];
+    delete end['mon'];
+		delete end['mday'];
+  }
+  // 분이 지워졌으면 앞부분도 다 지워진 것이므로 구분자 불필요
+  if (!isset(end['minutes'])) separator = ''; 
+
+  var out = [];
+  if (isset(start['year'])) out[out.length] = start['year']+'년';
+  if (isset(start['mon'])) out[out.length] = start['mon']+'월';
+  if (isset(start['mday'])) out[out.length] = start['mday']+'일';
+  if (isset(start['mday'])) out[out.length] = '('+_whatDay(start['wday'])+')';
+  if (isSuffixShort) {
+    if (isset(start['hours']) && isset(start['minutes'])) {
+      if (start['minutes']<10) start['minutes']='0'+start['minutes'];
+      out[out.length] = start['hours']+suffix_hour+start['minutes'];
+    }
+  } else {
+    if (isset(start['hours'])) out[out.length] = start['hours']+suffix_hour;
+    if (isset(start['minutes']))
+      if (start['minutes']<10) out[out.length] = '0'+start['minutes']+suffix_minute;
+      else out[out.length] = start['minutes']+suffix_minute;
+  }
+  out[out.length] = separator;
+  if (isset(end['year'])) out[out.length] = end['year']+'년';
+  if (isset(end['mon'])) out[out.length] = end['mon']+'월';
+  if (isset(end['mday'])) out[out.length] = end['mday']+'일';
+  if (isset(end['mday'])) out[out.length] = '('+_whatDay(end['wday'])+')';
+  if (isSuffixShort) {
+    if (isset(end['hours']) && isset(end['minutes'])) {
+      if (end['minutes']<10) end['minutes']='0'+end['minutes'];
+      out[out.length] = end['hours']+suffix_hour+end['minutes'];
+    }
+  } else {
+    if (isset(end['hours'])) out[out.length] = end['hours']+suffix_hour;
+    if (isset(end['minutes']))
+      if (end['minutes']<10) out[out.length] = '0'+end['minutes']+suffix_minute;
+      else out[out.length] = end['minutes']+suffix_minute;
+  }
+  return implode(' ',out);
+}
+
+// trim() 
+String.prototype.trim = function(chars) {
+  if(chars){
+    var str = "[" + chars + "\\s]+";
+    return this.replace(new RegExp(str, "g"), "");
+  }
+  return this.replace(/^\s+|\s+$/g,"");
+}
+// ltrim() 
+String.prototype.ltrim = function(chars) {
+  if(chars){
+    var str = "^[" + chars + "\\s]+";
+    return this.replace(new RegExp(str, "g"), "");
+  }
+  return this.replace(/^\s+/,"");
+}
+// rtrim() 
+String.prototype.rtrim = function(chars) {
+  if(chars){
+    var str = "[" + chars + "\\s]+$";
+    return this.replace(new RegExp(str, "g"), "");
+  }
+  return this.replace(/\s+$/,"");
+}
+// zerofill
+String.prototype.zerofill=function(length){
+  length -= this.toString().length;
+  if ( length > 0 ) {
+    return new Array( length + (/\./.test( this ) ? 2 : 1) ).join( '0' ) + this;
+  }
+  return this;
+}
+Number.prototype.zerofill=function(length){
+  length -= this.toString().length;
+  if ( length > 0 ) {
+    return new Array( length + (/\./.test( this ) ? 2 : 1) ).join( '0' ) + this;
+  }
+  return this;
+}
+// number_format
+String.prototype.number_format=function(){
+  return this.replace(/(\d)(?=(?:\d{3})+(?!\d))/g,'$1,');
+}
+Number.prototype.number_format=function(){
+  return this.toString().replace(/(\d)(?=(?:\d{3})+(?!\d))/g,'$1,');
+}
+
+// 문자열의 숫자를 이미지 대응할 마크업으로 변경 (jquery datepicker에서 사용)
+String.prototype.toImage = function() {
+  var value=this.toString(), length=value.length, digit='', result='';
+  for(var i=0; i<length; i++) {
+    digit=value.charAt(i);
+    if (digit>=0 && digit<=9) {
+      result = result + '<div class="inlineBlock digit-image digit-'+digit+'"></div>';
+    } else if (digit=='.') {
+      result = result + '<div class="inlineBlock digit-image digit-dot"></div>';
+    } else {
+      result = result + digit;
+    }
+  }
+  return result;
+}
+Number.prototype.toImage = function() {
+  return this.toString().toImage();
+};
+if(typeof Array.isArray == 'undefined'){
+	/*IE8*/
+	Array.isArray = function (obj) {
+		return Object.prototype.toString.call(obj) === "[object Array]";
+	};
+}
+

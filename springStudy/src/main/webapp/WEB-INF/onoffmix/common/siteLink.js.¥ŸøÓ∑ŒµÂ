@@ -1,0 +1,163 @@
+//////////////////////////
+// Site Link
+//////////////////////////
+
+//sqstyle@APPEND _GoPageConfirm
+//100612 1724
+
+//Confirm 을 받고 True 일 경우 _GoPage 함수를 실행 시킨다
+function _GoPageConfirm(name,para,MSG)
+{
+  var conf = confirm(MSG)
+  if(conf == true)  _GoPage(name, para)
+}
+
+var useRewriteModule = true; // Is Using Apache Rewrite Module ?
+var isRefererOnRedirectSupported = !!(document.attachEvent) && !(document.addEventListener); // IE9부터 addEventListener 지원됨
+function _GoPage(name, para, manualTarget, hashLink) {
+// Public Link
+	var home = new Array('/','_self');	// HOME
+	var login = new Array('/account/login','_self'); // 로그인
+	var logout = new Array('/account/logout','_self'); // 로그아웃
+  //var lounge = new Array('/lounge','_self'); // 라운지
+  var faq = new Array('/faq/{{page}}','_self'); // 고객센터
+
+  var privacy = new Array('/legal/privacy','_blank'); // 개인정보보호정책
+  var agreement = new Array('/legal/agreement','_blank'); // 이용약관
+  var nonmemberAgreement = new Array('/legal/nonmemberAgreement','_blank'); // 비회원 이용약관
+  var cancelAndRefund = new Array('/legal/cancelAndRefund','_blank'); // 취소/환불 약관
+  var paymentAgreement = new Array('/legal/paymentAgreement','_blank'); // 온라인 결제기능 제공에 따른 안내
+  var disclaimer = new Array('/legal/disclaimer','_blank'); // 책임한계와 법적 고지
+  var mixmoneyLegal = new Array('/legal/mixmoney','_blank'); // 믹스머니 약관
+
+	var loginTwitter = new Array('/account/login/twitter','_self'); // 트위터 로그인
+	var loginFacebook = new Array('/account/login/facebook','_self'); // 페이스북 로그인
+	var loginGoogle = new Array('/account/login/google','_self'); // 구글 로그인
+	var loginMe2day = new Array('/account/login/me2day','_self'); // 미투데이 로그인
+	var loginDaum = new Array('/account/login/daum','_self'); // 다음 로그인
+	var loginNate = new Array('/account/login/nate','_self'); // 네이트 로그인
+
+  var memberJoin = new Array('/account/join?returnUrl={{returnUrl}}','_self'); // 회원가입
+	var memberModify = new Array('/account/edit','_self'); // 회원정보 수정
+	var memberModifyPassword = new Array('/account/pass','_self'); // 비밀번호 변경
+	var memberOut = new Array('/account/out','_self'); // 회원탈퇴
+	var findEmail = new Array('/account/findemail','_self'); // 회원가입여부확인
+	var findPassword = new Array('/account/findpass','_self'); // 임시비밀번호발급
+
+	var createEvent = new Array('/event/add','_self'); // 이벤트 등록
+  var modifyEvent = new Array('/event/edit/{{eventIdx}}','_self'); // 이벤트 수정
+  var modifyEventConfigPanel = new Array('/event/edit/configPanel/{{eventIdx}}','_self'); // 부가기능 > 메인패널
+  var modifyEventSkin = new Array('/event/edit/skin/{{eventIdx}}','_self'); // 부가기능 > 스킨 설정
+  var modifyEventGroup = new Array('/event/edit/group/{{eventIdx}}','_self'); // 부가기능 > 접수그룹 설정
+  var modifyEventGroupAndPayment = new Array('/event/edit/groupAndPayment/{{eventIdx}}','_self'); // 부가기능 > 그룹/결제 설정
+  var modifyEventField = new Array('/event/edit/field/{{eventIdx}}','_self'); // 부가기능 > 입력항목 설정
+  var modifyEventSalesCode = new Array('/event/edit/salescode/{{eventIdx}}','_self'); // 부가기능 > 통계코드 설정
+  var deleteEvent = new Array('/event/delete/{{eventIdx}}','_self'); // 이벤트 삭제
+  var ownerEvents = new Array('/account/event/owned','_self'); // 내가 만든 이벤트
+  var adminEventPayment = new Array('/event/manage/payment/{{eventIdx}}','_self'); // 이벤트관리 : 결제내역
+  var adminEventParticipant = new Array('/event/manage/participant/{{eventIdx}}','_self'); // 이벤트관리 : 등록자
+  var adminEventParticipantExcel = new Array('/event/manage/participantExcel/{{eventIdx}}','_self'); // 이벤트관리 : 등록자 Excel Export
+  var adminEventTrackback = new Array('/event/manage/trackback/{{eventIdx}}','_self'); // 이벤트관리 : 트랙백
+  var adminEventComment = new Array('/event/manage/comment/{{eventIdx}}','_self'); // 이벤트관리 : 덧글
+  var adminEventDatalink = new Array('/event/manage/data/{{eventIdx}}','_self'); // 이벤트관리 : 데이터링크
+  var adminEventInvite = new Array('/event/manage/invite/{{eventIdx}}','_self'); // 이벤트관리 : 초대메일발송
+  var adminEventEmail = new Array('/event/manage/mail/{{eventIdx}}','_self'); // 이벤트관리 : 단체메일발송
+  var ownerEventSms = new Array('/event/sms/{{eventIdx}}','_self'); // 공지/초대 : 문자메세지 보내기
+  var ownerEventEmail = new Array('/event/email/{{eventIdx}}','_self'); // 공지/초대 : E-mail 보내기
+
+  var addressbookMy = new Array('/event/addressbook/my/{{eventIdx}}','_self'); // 내 주소록
+  var addressbookEvent = new Array('/event/addressbook/event/{{eventIdx}}','_self'); // 내 모임 주소록
+  var addressbookImport = new Array('/event/addressbook/import/{{eventIdx}}','_self'); // 주소 불러오기
+
+  var eventPlace = new Array('/event/place/{{eventIdx}}','_self'); // 이벤트별 장소 대관신청 내역
+
+  var viewEvent = new Array('/event/{{eventIdx}}','_self'); // 이벤트 보기
+  var attendEvent = new Array('/rsvp/attend/{{eventIdx}}','_self'); // 참가등록
+  var attendEventPayment = new Array('/rsvp/attend/payment/{{eventIdx}}','_self'); // 참가비 결제
+  var attendEventTicket = new Array('/rsvp/attend/ticket/{{eventIdx}}','popup',923,364,'no','no','no'); // 참가 티켓 보기
+  var modifyParticipant = new Array('/rsvp/edit/{{eventIdx}}','_self'); // 참가등록 수정
+  var deleteParticipant = new Array('/rsvp/cancel/{{eventIdx}}','_self'); // 참가등록 삭제
+  var cancelEventPayment = new Array('/rsvp/cancel/payment/{{eventIdx}}/{{groupIdx}}','_self'); // 참가비 결제취소
+
+  var mypage = new Array('/{{userDomain}}','_self'); // 마이페이지 메인
+  //var mypageInvolvedComment = new Array('/{{userDomain}}/comment','_self'); // 내가 작성한 덧글 목록
+  var mypageInvolvedEvent = new Array('/account/event/involved','_self'); // 내가 참여한 이벤트 목록
+
+  var pilotPartnerGuide = new Array('/pilot/partnerGuide/{{num}}','_self'); // 제휴서비스 안내
+
+  // 브랜드 메인
+  var service = new Array('/pilot/advertisingGuide/','_self'); // 서비스
+  var event = new Array('/','_self'); // 모임
+  var place = new Array('/place','_self'); // 장소
+
+
+
+
+  var zipcode = new Array('/_/zipcode/zipcode.ofm','popup',470,215,'no','no','no'); // 우편번호 검색
+
+// AlwaysTarget 
+	var AlwaysTarget;
+	var nowurl = document.location.href;
+	switch (true) {
+//		case (nowurl.indexOf('sitemap.html') > 0) :
+//			AlwaysTarget = 'opener';
+//			break;
+		default :
+			AlwaysTarget = null;
+	}
+// Go Page
+	var site = eval(name);
+  if (site[0] == "") {
+    alert("서비스 준비중입니다.");
+    return;    
+  } else {
+		if (AlwaysTarget) site[1] = AlwaysTarget;
+    if (manualTarget) site[1] = manualTarget;
+    if (para) {
+      if (useRewriteModule === true) {
+        para = para.split('&');
+        for (var i=0; i<para.length; i++) {
+          para[i] = para[i].split('=');
+          para[i][0] = '{{'+para[i][0]+'}}';
+          site[0] = site[0].replace(para[i][0],para[i][1]);
+        }
+      } else {
+        if (site[0].indexOf('?') > 0) site[0] = site[0]+'&'+para;
+        else site[0] = site[0]+'?'+para;
+      }
+    }
+    site[0] = site[0].replace(/{{[a-zA-Z]+}}/i,'');
+    if (hashLink) { site[0] = site[0]+'#'+hashLink; }
+		switch (site[1]) {
+			case "_self" :
+        if (isRefererOnRedirectSupported) {
+          var referLink = document.createElement('a');
+          referLink.href = site[0];
+          document.body.appendChild(referLink);
+          referLink.click();
+        } else {
+          document.location.href = site[0];
+        }
+				break;
+			case "_parent" :
+				parent.document.location.href = site[0];
+				break;
+			case "_blank" :
+				window.open(site[0],'_blank');
+				break;
+			case "opener" :
+				opener.document.location.href = site[0];
+				break;
+			case "popup" :
+        var d = new Date();
+        var suffix = d.getTime(); // _msgAlert()에서 팝업으로 구분해 닫을 수 있도록 이름 지정
+				window.open(site[0],'__popup_'+suffix,'width='+site[2]+',height='+site[3]+',left=0,top=0,toolbar='+site[5]+',scrollbars='+site[4]+',resizable='+site[6]);
+				break;
+			case "alert" :
+				alert(site[0]);
+				break;
+			default :
+				alert("링크오류");
+		}
+	}
+}

@@ -1,0 +1,288 @@
+$(function () {
+	function loggerCall(eventName, event) {
+		if (event.which == 3) return;
+		eval('try{ _trk_clickTrace( \'EVT\', \'' + eventName + '\' ); }catch(_e){ }');
+	}
+
+	$('.gnbMenu .siteMenu li a[href*="event"]').on('click', function(event) {
+		var href = location.href.replace(/\//g,'%2F');
+		var eventName = '/GNB/모임/{{location.href}}/'.replace('{{location.href}}', href);
+		loggerCall(eventName, event);
+	});
+	$('.gnbMenu .siteMenu li a[href*="place"]').on('click', function(event) {
+		var href = location.href.replace(/\//g,'%2F');
+		var eventName = '/GNB/플레이스/{{location.href}}/'.replace('{{location.href}}', href);
+		loggerCall(eventName, event);
+	});
+	$('.gnbMenu .siteMenu li a[href*="market"]').on('click', function(event) {
+		var href = location.href.replace(/\//g,'%2F');
+		var eventName = '/GNB/마켓/{{location.href}}/'.replace('{{location.href}}', href);
+		loggerCall(eventName, event);
+	});
+	$('.gnbMenu .serviceMenu li a[href*="account/login"]').on('click', function(event) {
+		var href = location.href.replace(/\//g,'%2F');
+		var eventName = '/GNB/로그인/{{location.href}}/'.replace('{{location.href}}', href);
+		loggerCall(eventName, event);
+	});
+	$('.gnbMenu .serviceMenu li a[href*="account/logout"]').on('click', function(event) {
+		var href = location.href.replace(/\//g,'%2F');
+		var eventName = '/GNB/로그아웃/{{location.href}}/'.replace('{{location.href}}', href);
+		loggerCall(eventName, event);
+	});
+	//$('.gnbMenu .serviceMenu li a[href*="event/manage"]').on('click', function(event) {
+	//	var href = location.href.replace(/\//g,'%2F');
+	//	var eventName = '/GNB/모임관리/{{location.href}}/'.replace('{{location.href}}', href);
+	//	loggerCall(eventName, event);
+	//});
+	//$('.gnbMenu .serviceMenu li a[href*="market/manage"]').on('click', function(event) {
+	//	var href = location.href.replace(/\//g,'%2F');
+	//	var eventName = '/GNB/마켓관리/{{location.href}}/'.replace('{{location.href}}', href);
+	//	loggerCall(eventName, event);
+	//});
+	//$('.gnbMenu .serviceMenu li.btnSubBrand a').on('click', function(event) {
+	//	var href = location.href.replace(/\//g,'%2F');
+	//	var eventName = '/GNB/서브브랜드/{{location.href}}/'.replace('{{location.href}}', href);
+	//	loggerCall(eventName, event);
+	//});
+	$('.gnbMenu .serviceMenu li a span.menuMypage').on('click', function(event) {
+		var href = location.href.replace(/\//g,'%2F');
+		var eventName = '/GNB/마이페이지/{{location.href}}/'.replace('{{location.href}}', href);
+		loggerCall(eventName, event);
+	});
+
+	$('.layerDetailMypage li a[href*="account/event"]').on('click', function(event) {
+		var href = location.href.replace(/\//g,'%2F');
+		var eventName = '/GNB/마이페이지/신청내역/{{location.href}}/'.replace('{{location.href}}', href);
+		loggerCall(eventName, event);
+	});
+	$('.layerDetailMypage li a[href*="account/payment"]').on('click', function(event) {
+		var href = location.href.replace(/\//g,'%2F');
+		var eventName = '/GNB/마이페이지/결제내역/{{location.href}}/'.replace('{{location.href}}', href);
+		loggerCall(eventName, event);
+	});
+	$('.layerDetailMypage li a[href*="account/market"]').on('click', function(event) {
+		var href = location.href.replace(/\//g,'%2F');
+		var eventName = '/GNB/마이페이지/마켓이용내역/{{location.href}}/'.replace('{{location.href}}', href);
+		loggerCall(eventName, event);
+	});
+	$('.layerDetailMypage li a[href*="account/edit"]').on('click', function(event) {
+		var href = location.href.replace(/\//g,'%2F');
+		var eventName = '/GNB/마이페이지/회원정보수정/{{location.href}}/'.replace('{{location.href}}', href);
+		loggerCall(eventName, event);
+	});
+	$('.layerDetailMypage li a[href*="account/pass"]').on('click', function(event) {
+		var href = location.href.replace(/\//g,'%2F');
+		var eventName = '/GNB/마이페이지/비밀번호변경/{{location.href}}/'.replace('{{location.href}}', href);
+		loggerCall(eventName, event);
+	});
+
+	$('.gnbMenu .serviceMenu li a[href*="service"]').on('click', function(event) {
+		var href = location.href.replace(/\//g,'%2F');
+		var eventName = '/GNB/서비스안내/{{location.href}}/'.replace('{{location.href}}', href);
+		loggerCall(eventName, event);
+	});
+	$('.gnbMenu .serviceMenu li a span.menuCustomercenter').on('click', function(event) {
+		var href = location.href.replace(/\//g,'%2F');
+		var eventName = '/GNB/고객센터/{{location.href}}/'.replace('{{location.href}}', href);
+		loggerCall(eventName, event);
+	});
+	$('.logoSearchArea h1 a').on('click', function(event) {
+		var href = location.href.replace(/\//g,'%2F');
+		var eventName = '/GNB/로고/{{location.href}}/'.replace('{{location.href}}', href);
+		loggerCall(eventName, event);
+	});
+
+	//GNB/검색/버튼클릭/{{location.href}}/
+	$('.logoSearchArea .searchArea form').on('submit', function(event) {
+		var href = location.pathname;
+		href=href.replace('/','').replace(/\//g, '%2F');;
+		var eventName = '/GNB/검색/버튼클릭/{{location.href}}/'.replace('{{location.href}}', href);
+		loggerCall(eventName, event);
+	});
+	//GNB/검색/자동완성/{{location.href}}/딜레이가 지난후
+	// 1) $('.header .search input.text') 에서 autocompletesearch 이벤트를 검출할 수 있으면 다른 것과 동일하게 작성
+	$('.logoSearchArea .searchArea input.text').on('autocompletesearch', function(event, ui) {
+		var href = location.pathname;
+		href=href.replace('/','').replace(/\//g, '%2F');;
+		var eventName = '/GNB/검색/자동완성/{{location.href}}/'.replace('{{location.href}}', href);
+		loggerCall(eventName, event);
+	});
+	// 2) ~search 이벤트 검출이 곤란하면 js3/common.js 안의 autocomplete 선언 중에 search 항목에 직접 추가할 것.
+	///GNB/검색/모임검색/{{출력순서}}번째/{{모임번호}}/{{검색어}}/
+	// 1) autocompleteselect 이벤트 검출해서 처리
+	$('.logoSearchArea .searchArea input.text').on('autocompleteselect', function(event, ui) {
+		var searchText = $(this).data('ui-autocomplete').oldTerm.replace(/\//g, '%2F');
+		var target = event.srcElement;
+		var listOrder = $(target).closest('.ui-menu-item').index('.ui-menu-item')+1;
+		if('eventIdx' in ui.item.data) {
+			var idx = ui.item.data.eventIdx;
+			var type = "모임검색";
+		}
+		var eventName = '/GNB/검색/{{type}}/{{listOrder}}번째/{{idx}}/{{searchText}}/'.replace('{{type}}',type).replace('{{listOrder}}', listOrder).replace('{{idx}}', idx).replace('{{searchText}}', searchText);
+		loggerCall(eventName, event);
+	});
+	// 2) common.js autocomplete select 항목 안에서 진행
+	// - common.js에서 return false로 끝나는 상태이기 때문에 이벤트가 발생하지 않을 수 있음. return false 제거하고 다른 영향 없이 진행되는지 확인한 다음 진행할 것. 영향이 있다면 common.js 안에서 처리할 것.
+	///GNB/검색/사용자검색/{{출력순서}}번째/{{사용자번호}}/{{검색어}}/
+	// 모임검색과 동일. - 모임검색인지 사용자 검색인지의 구분은 .ui-autocomplete-category와 placeholder 사이에 있는 것을 검출할 것.
+	///GNB/검색/검색더보기/{{검색어}}/
+	// 1) #searchInput-autocomplete-menu 안의 더보기 마크업을 대상으로 (내용이 계속 갱신되기 때문에 bind는 사용할 수 없고) .delegate('click')을 검출하여, 다른 것과 동일하게 작성할 것.
+	$('body').delegate('#searchInput-autocomplete-menu .more a', 'mousedown', function(event) {
+		var searchText = $('.header .search input.text').val().replace(/\//g, '%2F');
+		var eventName = '/GNB/검색/검색더보기/{{searchText}}/'.replace('{{searchText}}',searchText);
+		loggerCall(eventName, event);
+	});
+
+	$('.logoSearchArea .searchArea .recommendationSearch a').on('click', function(event) {
+		var href = location.href.replace(/\//g,'%2F');
+		var eventName = '/GNB/추천모임/{{location.href}}/'.replace('{{location.href}}', href);
+		loggerCall(eventName, event);
+	});
+	$('.logoSearchArea .headerBannerImg a').on('click', function(event) {
+		var href = location.href.replace(/\//g,'%2F');
+		var eventName = '/GNB/광고영역/{{location.href}}/'.replace('{{location.href}}', href);
+		loggerCall(eventName, event);
+	});
+});
+
+
+//// GNB
+//$('.header a.logo').bind('mousedown', function(event) {
+//  var href = location.href.replace(/\//g,'%2F');
+//  var eventName = '/GNB/로고/{{location.href}}/'.replace('{{location.href}}', href);
+//  loggerCall(eventName, event);
+//});
+//$('.header a[href*="login"]').bind('mousedown', function(event) {
+//  var href = location.href.replace(/\//g,'%2F');
+//  var eventName = '/GNB/로그인/{{location.href}}/'.replace('{{location.href}}', href);
+//  loggerCall(eventName, event);
+//});
+//$('.header a[href*="logout"]').bind('mousedown', function(event) {
+//  var href = location.href.replace(/\//g,'%2F');
+//  var eventName = '/GNB/로그아웃/{{location.href}}/'.replace('{{location.href}}', href);
+//  loggerCall(eventName, event);
+//});
+//$('.header a[href*="memberJoin"]').bind('mousedown', function(event) {
+//  var href = location.href.replace(/\//g,'%2F');
+//  var eventName = '/GNB/회원가입/{{location.href}}/'.replace('{{location.href}}', href);
+//  loggerCall(eventName, event);
+//});
+//$('.header a[href*="createEvent"]').bind('mousedown', function(event) {
+//  var href = location.href.replace(/\//g,'%2F');
+//  var eventName = '/GNB/모임개설/{{location.href}}/'.replace('{{location.href}}', href);
+//  loggerCall(eventName, event);
+//});
+//$('.header a[href*="ownerEvents"]').bind('mousedown', function(event) {
+//  var href = location.href.replace(/\//g,'%2F');
+//  var eventName = '/GNB/모임관리/{{location.href}}/'.replace('{{location.href}}', href);
+//  loggerCall(eventName, event);
+//});
+//$('.header a[href*="mypage"]').bind('mousedown', function(event) {
+//  var href = location.href.replace(/\//g,'%2F');
+//  var eventName = '/GNB/마이페이지/{{location.href}}/'.replace('{{location.href}}', href);
+//  loggerCall(eventName, event);
+//});
+//$('.header-menu-submenu a[href$="/account/edit"]').bind('mousedown', function(event) {
+//  var href = location.href.replace(/\//g,'%2F');
+//  var eventName = '/GNB/마이페이지/회원정보수정/{{location.href}}/'.replace('{{location.href}}', href);
+//  loggerCall(eventName, event);
+//});
+//$('.header-menu-submenu a[href$="/account/pass"]').bind('mousedown', function(event) {
+//  var href = location.href.replace(/\//g,'%2F');
+//  var eventName = '/GNB/마이페이지/비밀번호변경/{{location.href}}/'.replace('{{location.href}}', href);
+//  loggerCall(eventName, event);
+//});
+//$('.header-menu-submenu a[href$="/account/event"]').bind('mousedown', function(event) {
+//  var href = location.href.replace(/\//g,'%2F');
+//  var eventName = '/GNB/마이페이지/신청내역/{{location.href}}/'.replace('{{location.href}}', href);
+//  loggerCall(eventName, event);
+//});
+//$('.header-menu-submenu a[href$="/account/payment"]').bind('mousedown', function(event) {
+//  var href = location.href.replace(/\//g,'%2F');
+//  var eventName = '/GNB/마이페이지/결제내역/{{location.href}}/'.replace('{{location.href}}', href);
+//  loggerCall(eventName, event);
+//});
+//$('.header a[href*="faq"]').bind('mousedown', function(event) {
+//  var href = location.href.replace(/\//g,'%2F');
+//  var eventName = '/GNB/고객센터/{{location.href}}/'.replace('{{location.href}}', href);
+//  loggerCall(eventName, event);
+//});
+//$('.header a[href="#calendar"]').bind('mousedown', function(event) {
+//  var href = location.href.replace(/\//g,'%2F');
+//  var eventName = '/GNB/캘린더보기/{{location.href}}/'.replace('{{location.href}}', href);
+//  loggerCall(eventName, event);
+//});
+//$('.header a.showAll[href="/search"]').bind('mousedown', function(event) {
+//  var href = location.href.replace(/\//g,'%2F');
+//  var eventName = '/GNB/전체보기/{{location.href}}/'.replace('{{location.href}}', href);
+//  loggerCall(eventName, event);
+//
+//});
+//$('.brand-menu .event a').bind('mousedown', function(event) {
+//  var href = location.href.replace(/\//g,'%2F');
+//  var eventName = '/GNB/모임/{{location.href}}/'.replace('{{location.href}}', href);
+//  loggerCall(eventName, event);
+//});
+//$('.brand-menu .service a').bind('mousedown', function(event) {
+//  var href = location.href.replace(/\//g,'%2F');
+//  var eventName = '/GNB/서비스/{{location.href}}/'.replace('{{location.href}}', href);
+//  loggerCall(eventName, event);
+//});
+//$('.brand-menu .place a').bind('mousedown', function(event) {
+//  var href = location.href.replace(/\//g,'%2F');
+//  var eventName = '/GNB/플레이스/{{location.href}}/'.replace('{{location.href}}', href);
+//  loggerCall(eventName, event);
+//});
+//$('.brand-menu .market a').bind('mousedown', function(event) {
+//  var href = location.href.replace(/\//g,'%2F');
+//  var eventName = '/GNB/마켓/{{location.href}}/'.replace('{{location.href}}', href);
+//  loggerCall(eventName, event);
+//});
+//
+/////GNB/검색/버튼클릭/{{location.href}}/
+//$('.header .search form').bind('submit', function(event) {
+//  var href = location.pathname;
+//  href=href.replace('/','').replace(/\//g, '%2F');;
+//  var eventName = '/GNB/검색/버튼클릭/{{location.href}}/'.replace('{{location.href}}', href);
+//  loggerCall(eventName, event);
+//});
+/////GNB/검색/자동완성/{{location.href}}/딜레이가 지난후
+//// 1) $('.header .search input.text') 에서 autocompletesearch 이벤트를 검출할 수 있으면 다른 것과 동일하게 작성
+//$('.header .search input.text').bind('autocompletesearch', function(event, ui) {
+//  var href = location.pathname;
+//  href=href.replace('/','').replace(/\//g, '%2F');;
+//  var eventName = '/GNB/검색/자동완성/{{location.href}}/'.replace('{{location.href}}', href);
+//  loggerCall(eventName, event);
+//});
+//// 2) ~search 이벤트 검출이 곤란하면 js3/common.js 안의 autocomplete 선언 중에 search 항목에 직접 추가할 것.
+/////GNB/검색/모임검색/{{출력순서}}번째/{{모임번호}}/{{검색어}}/
+//// 1) autocompleteselect 이벤트 검출해서 처리
+//$('.header .search input.text').bind('autocompleteselect', function(event, ui) {
+//  var searchText = $(this).data('ui-autocomplete').oldTerm.replace(/\//g, '%2F');
+//  var target = event.srcElement;
+//  var listOrder = $(target).closest('.ui-menu-item').index('.ui-menu-item')+1;
+//  if('eventIdx' in ui.item.data) {
+//    var idx = ui.item.data.eventIdx;
+//    var type = "모임검색";
+//  }else if('userDomain' in ui.item){
+//    var idx=ui.item.userDomain;
+//    var type ="사용자검색";
+//    listOrder=listOrder-($('li.ui-menu-item').length-$('.ui-autocomplete-category.result-user~li.ui-menu-item').length);
+//  }
+//  var eventName = '/GNB/검색/{{type}}/{{listOrder}}번째/{{idx}}/{{searchText}}/'.replace('{{type}}',type).replace('{{listOrder}}', listOrder).replace('{{idx}}', idx).replace('{{searchText}}', searchText);
+//  loggerCall(eventName, event);
+//});
+//// 2) common.js autocomplete select 항목 안에서 진행
+//// - common.js에서 return false로 끝나는 상태이기 때문에 이벤트가 발생하지 않을 수 있음. return false 제거하고 다른 영향 없이 진행되는지 확인한 다음 진행할 것. 영향이 있다면 common.js 안에서 처리할 것.
+/////GNB/검색/사용자검색/{{출력순서}}번째/{{사용자번호}}/{{검색어}}/
+//// 모임검색과 동일. - 모임검색인지 사용자 검색인지의 구분은 .ui-autocomplete-category와 placeholder 사이에 있는 것을 검출할 것.
+/////GNB/검색/검색더보기/{{검색어}}/
+//// 1) #searchInput-autocomplete-menu 안의 더보기 마크업을 대상으로 (내용이 계속 갱신되기 때문에 bind는 사용할 수 없고) .delegate('click')을 검출하여, 다른 것과 동일하게 작성할 것.
+//$('body').delegate('#searchInput-autocomplete-menu .more a', 'mousedown', function(event) {
+//  var searchText = $('.header .search input.text').val().replace(/\//g, '%2F');
+//  var eventName = '/GNB/검색/검색더보기/{{searchText}}/'.replace('{{searchText}}',searchText);
+//  loggerCall(eventName, event);
+//});
+//// 2) 1이 진행되지 않으면 common.js 내부에서 _initPopup()이 tmpl()로 마크업을 생성한 후에 이벤트 처리하도록 작성할 것.
+//// 검색 동작 관련은 common.js 안에서 검색 부문 지정하면서 직접 해당부분 호출할 것.
+//

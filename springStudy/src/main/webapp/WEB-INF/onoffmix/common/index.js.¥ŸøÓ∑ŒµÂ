@@ -1,0 +1,266 @@
+
+$(function () {
+	$('body').addClass('bgMain');
+
+	var owlCarouselItem = "";
+	if($(".pickUpAd").find(".item").length > 1){
+		owlCarouselItem = ".brandingArea, .sideAdArea, .pickUpAd";
+	}else{
+		owlCarouselItem = ".brandingArea, .sideAdArea";
+	}
+	/* owlCarousel slide */
+	$(owlCarouselItem).owlCarousel({
+		center: true,
+		items:1,
+		loop: true,
+		nav: true,
+		margin: 10,
+		autoplay: false,
+		autoplayHoverPause: true
+	});
+	$(".owl-carousel .owl-dot").hover(function(){
+		$(this).click();
+	}, function(){});
+
+	$(".owl-nav").css("display", "none");
+	/* brandingArea nav */
+	$(".brandingArea").each(function() {
+		$(this).mouseover(function() {
+			$(".brandingArea .owl-nav").css("display", "block");
+		});
+		$(this).mouseout(function() {
+			$(".brandingArea .owl-nav").css("display", "none");
+		});
+	});
+	/* sideAdArea nav */
+	$(".sideAdArea").each(function() {
+		$(this).mouseover(function() {
+			$(".sideAdArea .owl-nav").css("display", "block");
+		});
+		$(this).mouseout(function() {
+			$(".sideAdArea .owl-nav").css("display", "none");
+		});
+	});
+	/* pickUpAd nav */
+	$(".pickUpAd").each(function() {
+		$(this).mouseover(function() {
+			$(".pickUpAd .owl-nav").css("display", "block");
+		});
+		$(this).mouseout(function() {
+			$(".pickUpAd .owl-nav").css("display", "none");
+		});
+	});
+/*
+	$('.layerServiceNavigation').on({
+		focus : function() {
+			$(this).show();
+			dotdotdot();
+		},
+		mouseover : function() {
+			$(this).show();
+			$('.sideMenu ul li a').removeClass('select');
+			$('.sideMenu ul li[data-role="'+$(this).attr('data-role')+'"] a').addClass('select');
+			dotdotdot();
+		},
+		blur : function() {ellipsis	: '... ',
+			$(this).hide();
+		},
+		mouseout : function() {
+			$('.sideMenu ul li a').removeClass('select');
+			$(this).hide();
+		}
+	});
+*/
+	$('ul.brandingArea1 li a span,' +
+		'ul.brandingArea1 li dl dt,' +
+		'ul.brandingArea1 li dl dd,' +
+		'ul.brandingArea1 li .facebookArea li.textArea1,' +
+		'ul.brandingArea2 li dl dt,' +
+		'ul.brandingArea2 li dl dd')
+			.dotdotdot({
+			ellipsis : '...'
+		});
+
+	$('.eventImgWrap img').lazyload({
+		placeholder : base_httpStatic+'/images3/default/eventBanner_440.jpg',
+		threshold : 200
+	});
+	$('.slideTitle').dotdotdot({
+		ellipsis : '...'
+	});
+	$(".text , .eventIntro ").dotdotdot({
+		ellipsis : '...'
+	});
+	/* 연락 전 확인사항 */
+	$('.infomationCustomerCenter .iconCs').on({
+		mouseover : function() {
+			sideMenuOnOver('on', $(this), 'class');
+		},
+		mouseout : function() {
+			sideMenuOnOver('off', $(this), 'class');
+		}
+	});
+
+	//실시간 모임순위
+	var selectNumber = 4;
+	var mTop = 0;
+	var rollUpTimer = function() {
+		$('.moreRaking ol').first().stop(false,true).animate({
+			marginTop : -27
+		}, 500, 'linear', function() {
+			$('.moreRaking ol').css('margin-top', '0');
+			$('.moreRaking li').first().appendTo($(this).last());
+
+			/*mTop = parseInt($('.moreRaking ol').first().css('margin-top'));
+			switch (mTop) {
+				case -135: $('.moreRaking li').append($('.moreRaking ol li').first().css('margin-top', '27px')); break;
+				case -189: $('.moreRaking ol').first().remove(); $('.moreRaking ol').css('margin-top', '0'); break;
+				default: break;
+			}*/
+		});
+		selectNumber > 9 ? selectNumber = 4 : selectNumber++;
+	};
+	var rollUpInterval = setInterval(rollUpTimer, 3000);
+	var delayMouse = '';
+
+	$('.moreRaking').on('mouseenter focus', function() {
+		rollUpInterval && clearInterval(rollUpInterval);
+		delayMouse = setTimeout(function() {
+			$('.layerMoreRanking').show();
+			$('.layerMoreRanking ol li').removeClass('select');
+			$('.layerMoreRanking ol li:nth-child(' + (selectNumber-3) + ')').addClass('select');
+		}, 700);
+		delayMouse;
+	});
+	$('.moreRaking').on('mouseleave blur', function() {
+		clearTimeout(delayMouse);
+	});
+	$('.layerMoreRanking').on('mouseleave blur', function() {
+		$('.layerMoreRanking').hide();
+		rollUpInterval && clearInterval(rollUpInterval);
+		clearTimeout(delayMouse);
+		rollUpInterval = setInterval( rollUpTimer, 3000);
+	});
+
+	//개편 메인 탑배너
+	function topBanner(){
+		var selectMenu = $('.mainWrap ul li.selected');
+		var eventList  = $('.mainWrap ul li');
+		$(eventList).removeClass('noneBorder');
+		$(selectMenu).removeClass('selected').next().addClass('selected');
+		if( selectMenu.is(':last-child') ){
+			selectMenu.removeClass('selected');
+			$('.firstList').addClass('selected');
+		}else{
+			$(selectMenu).addClass('noneBorder');
+		}
+	}
+
+	$(".topBannerEventArea li").mouseenter(function(){
+		if( $(this).hasClass('selected') == false ){
+			var listIndex = $(this).index();
+			$(".mainWrap ul li").removeClass('selected').removeClass('noneBorder');
+			$(".topBannerEventArea li").eq(listIndex).addClass('selected');
+			$(".leftBanner li ").eq(listIndex).addClass('selected');
+			$(".rightBanner li").eq(listIndex).addClass('selected');
+			$(".topBannerImgArea li").eq(listIndex).addClass('selected');
+			$(".topBannerEventArea li.selected").prev().addClass('noneBorder');
+		}
+	});
+
+	var lastNum = $('.centerBanner .topBannerEventArea li').length;
+	if( lastNum > 1 ) {
+		function topBannerStop() {
+			clearInterval(startBannerEvent);
+		}
+		var startBannerEvent = setInterval(topBanner, 4000);
+		$(".centerBanner").hover(function () {
+			topBannerStop();
+		}, function () {
+			startBannerEvent = setInterval(topBanner, 4000);
+		});
+	}
+
+	$(".tagEventArea .eventImgWrap a").hover(function (){
+		$(this).parent().parent('.tagEventMenu').addClass('hoverLine');
+	}, function () {
+		$(this).parent().parent('.tagEventMenu').removeClass('hoverLine');
+	});
+
+	$('.botBannerArea ul li a').attr('target','_blank');
+});
+
+$(window).resize(function(){
+	$("html,body").trigger("scroll");
+});
+
+function sideMenuOnOver (sta, obj, selector) {
+	var css_class_name = '';
+	if (selector == 'class') {
+		css_class_name = obj.attr('class').substring(4, (obj.attr('class').length)).toLowerCase();
+	} else {
+		css_class_name = obj.children('span').first().attr('class');
+		css_class_name = css_class_name.substring(4, (css_class_name.length)).toLowerCase();
+	}
+
+	if (sta == 'on') {
+		$('.topBannerInfomationArea > div[data-role="'+css_class_name+'"]').show();
+		dotdotdot();
+	} else {
+		$('.topBannerInfomationArea > div[data-role="'+css_class_name+'"]').hide();
+	}
+}
+
+function wingRecordOnOver(className, sta){
+	if(sta=='on'){
+		$('.wingMiddle .seeEventLayer.'+className).show();
+	} else {
+		$('.wingMiddle .seeEventLayer.'+className).hide();
+	}
+}
+
+function dotdotdot() {
+	// 줄 자르기 (...) 표시
+	$('.ellipsis').dotdotdot({
+		ellipsis : '...'
+	});
+}
+
+function showFbLikeBtn(interval){
+	var callNode = function(){
+		var ifrm = $('<iframe>')
+			.attr('src', '//www.facebook.com/plugins/like.php?'
+									+'href=http%3A%2F%2Ffacebook.com%2Fonoffmix'
+									+'&width&layout=button_count&action=like&show_faces=false&share=false&height=21')
+			.attr('scrolling', 'no')
+			.attr('frameborder', '0')
+			.attr('allowTransparency', 'true')
+			.css('border', 'none')
+			.css('overflow', 'hidden')
+			.css('width', '110px')
+			.css('position', 'absolute')
+			.css('visibility', 'hidden')
+			.appendTo('body');
+
+		ifrm.ready(function(){
+			var replacement = $('iframe', 'li.facebookInfo');
+			var node = ifrm
+				.css('visibility', 'visible')
+				.css('top', '45px')
+				.css('left', '50%')
+				.css('margin-top', '0')
+				.css('margin-left', '-41px');
+			if(replacement.length>0){
+				replacement.before(node);
+				setTimeout(function(){replacement.remove();}, 10000);
+			}
+			else
+				$('li.facebookInfo').css('position', 'relative').append(node);
+		});
+	};
+
+	callNode();
+	var output = setInterval(function(){ callNode(); }, interval);
+
+	return output;
+}

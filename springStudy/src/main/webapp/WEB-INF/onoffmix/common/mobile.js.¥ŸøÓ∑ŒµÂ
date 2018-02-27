@@ -1,0 +1,87 @@
+function ofmMobile() {
+
+  var mobileDevice = false; // 접속된 기기의 모바일 유무
+
+  this.mobileDevice = function() {
+    return mobileDevice;
+  }
+
+  function init() {
+    mobileDevice = isMobile();
+    autoSwitch();
+  }
+
+  // Mobile Device Check
+  function isMobile() {
+    var mobileKeyWords = [
+      'BlackBerry', 'iPhone', 'iPod', //, 'iPad'  // Device Name
+      'Android', 'Windows CE', 'SymbianOS', // OS Name
+      //'LG', // workaround for "Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; MALGJS; rv:11.0) like Gecko"
+      'MOT', 'SAMSUNG', 'SonyEricsson', 'Nokia', 'HTC', // Cooperation Name
+      'mobile' // ETC
+    ];
+    for (var word in mobileKeyWords)
+      if (navigator.userAgent.indexOf(mobileKeyWords[word]) >= 0) return true;
+    return false;
+  }
+
+  // 호스트 변경 호출
+  function switchedHost(target) {
+    var href, newLocation;
+    target = target ? target : '_self';
+    if (typeof(location.pathname) != 'undefined') {
+      var toMatchPathList = [
+        '/account/unsubscribe',
+        '/brand/dental',
+        '/service/partner/circleconnection',
+        '/service/partner/gifticon',
+        '/service/partner/shmedia',
+        '/service/advert/website/mobile',
+        '/service/advert/website/banner',
+        '/service/advert/website/newsletter',
+        '/html/event/miniPayment.ofm',
+        '/html/event/miniPaymentResult.ofm',
+        '/cs/notice',
+      ];
+      for (var i in toMatchPathList) {
+        if (location.pathname.indexOf(toMatchPathList[i]) >= 0) {
+          return false;
+        }
+      }
+
+    }
+    if (location.href.match(base_http) != null || location.href.match(base_https) != null) {
+      newLocation = location.href.replace(base_http, base_httpMobile);
+      newLocation = newLocation.replace(base_https, base_httpMobile);
+    } else if (location.href.match(base_http.replace('/onoffmix.','/www.onoffmix.')) != null || location.href.match(base_https.replace('/onoffmix.','/www.onoffmix.')) != null) {
+      newLocation = location.href.replace(base_http.replace('/onoffmix.','/www.onoffmix.'), base_httpMobile);
+      newLocation = newLocation.replace(base_https.replace('/onoffmix.','/www.onoffmix.'), base_httpMobile);
+    } else if (location.href.match(base_httpMobile) != null) {
+      newLocation = location.href.replace('/#/','/').replace(base_httpMobile, base_https); // #은 jQuery Mobile을 쓸 때 구버전 Android 등에서 #과 /가 동일하게 동작하여서 대응하기 위함
+    } else
+      return false;
+    window.open(newLocation, target);
+  }
+  this.switchHost = switchedHost;
+  this.toPC = function() {
+    switchedHost();
+  }
+
+  // 최초접속시의 자동전환 (web -> mobile)
+  function autoSwitch() {
+    if (mobileDevice === true
+      && (location.href.match(base_http) != null || location.href.match(base_https) != null ||
+          location.href.match(base_http.replace('/onoffmix.','/www.onoffmix.')) != null || location.href.match(base_https.replace('/onoffmix.','/www.onoffmix.')) != null)
+    ) {
+      switchedHost();
+    }
+  }
+
+  // Initialize
+  init();
+};
+
+if(typeof _pcOnly == 'undefined' && $.cookie('isReqPcView') != 1){
+  var mobile = new ofmMobile();
+}
+

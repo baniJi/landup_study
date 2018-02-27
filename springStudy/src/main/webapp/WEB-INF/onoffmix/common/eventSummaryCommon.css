@@ -1,0 +1,1474 @@
+.wf-active .webFont {
+    font-family: "Spoqa Han Sans", Dotum, "돋움", sans, sans-serif, apple-gothic
+}
+
+body {
+    background: #f7f7f7;
+}
+
+#content {
+    position: relative;
+    width: 980px;
+    margin: 30px auto 20px auto;
+    color: #333333;
+}
+
+#content > h2.webFont {
+    margin-bottom: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+[data-tooltip] {
+    display: inline-block;
+    padding: 1px 3px;
+    background-color: #FFF;
+    font-size: 11px;
+    border: 1px solid #d8d8d8;
+    color: #888;
+    line-height: 1;
+    vertical-align: middle;
+}
+
+.info i {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-top: -2px;
+    margin-right: 3px;
+    background: url('/images/info_icon.gif');
+    vertical-align: middle;
+}
+
+.tip.view {
+    color: #999;
+}
+
+.tip.view a,
+.tip.view span {
+    color: #666;
+}
+
+.tip.view a:hover,
+.tip.view span:hover {
+    color: #4195f5;
+}
+
+.box {
+    width: 100%;
+    border: 1px solid #d8d8d8;
+    background: #ffffff;
+    box-sizing: border-box;
+}
+
+.blue {
+    color: #4195f5;
+}
+
+.red {
+    color: #ff0000;
+}
+
+.contentInnerWrap {
+    background-color: #fff;
+    border: 1px solid #d8d8d8;
+    padding: 10px 30px;
+}
+
+.ofmBtn {
+    border: 1px solid #3187e9;
+    border-radius: 4px;
+    background: #4195f5;
+    text-align: center;
+    font-weight: bold;
+    color: #fff;
+}
+
+.ofmBtn:hover {
+    background: #53a3ff;
+    cursor: pointer;
+}
+
+.normalBtn {
+    border: 1px solid #b8b8b8;
+    border-radius: 2px;
+    background: #fff;
+    font-size: 11px;
+    color: #666666;
+    letter-spacing: -1px;
+}
+
+.normalBtn:hover {
+    cursor: pointer;
+}
+
+.clear {
+    clear: both;
+}
+
+.ui-widget-content {
+    background: none;
+    border: 0;
+}
+
+#ui-doublePicker-div.ui-datepicker.ui-datepicker-multi {
+    z-index: 10 !important;
+}
+
+.ui-button-text-only .ui-button-text {
+    padding: 0;
+}
+
+.ui-spinner-button {
+    position: absolute;
+    display: inline-block;
+    width: 13px;
+    height: 13px;
+    right: 20px;
+    text-align: center;
+    border-radius: 0;
+}
+
+.ui-spinner-button.ui-spinner-down {
+    bottom: 0;
+}
+
+.ui-icon {
+    width: 6px;
+    height: 3px;
+    margin: 4px 4px 3px;
+}
+
+.ui-state-default .ui-icon-triangle-1-n {
+    background: url(/images3/misc/icon_spinner_arrow.png) no-repeat 0 0;
+}
+
+.ui-state-default .ui-icon-triangle-1-s {
+    background: url(/images3/misc/icon_spinner_arrow.png) no-repeat -7px 0;
+}
+
+.ui-selectmenu-menu {
+    margin-top: -2px;
+    border: 1px solid #ccc;
+}
+
+.ui-selectmenu-menu li {
+    background: #fff;
+    border: 0 !important;
+}
+
+.ui-selectmenu-menu.category {
+    margin-top: -3px;
+    z-index: 10 !important;
+}
+
+.ui-selectmenu-menu li a:hover {
+    background: #4195f5;
+    color: #fff;
+}
+
+.ui-selectmenu {
+    height: 28px;
+    background: #fff;
+    opacity: 1;
+}
+
+.ui-selectmenu.ui-selectmenu-disabled {
+    cursor: not-allowed !important;
+}
+
+.ui-selectmenu .ui-selectmenu-icon {
+    width: 13px;
+    height: 28px;
+    margin: 0;
+    border-left: 1px solid #e4e4e4;
+    background: url(/images3/misc/icon_dropdown_arrow.png) no-repeat 0 0 !important;
+}
+
+.ui-selectmenu-status {
+    height: 28px;
+    background: #fff;
+    line-height: 28px;
+}
+
+select[name="selectableGroupLimit"] + a.ui-selectmenu {
+    vertical-align: middle;
+}
+
+.box .paymentInfo .accordion .ui-accordion-header {
+    margin: 0;
+    padding: 14px 10px;
+    border: 1px solid #d8d8d8;
+    border-radius: 0;
+    background: #f8f8f8;
+    color: #333333;
+}
+
+.box .paymentInfo .accordion .ui-accordion-header .ui-accordion-header-icon {
+    display: none;
+}
+
+.box .paymentInfo .accordion .ui-accordion-header i {
+    display: inline-block;
+    width: 9px;
+    height: 6px;
+    margin-bottom: 1px;
+    background: url(/images3/misc/icon_accordion_arrow.png) no-repeat 0 -10px;
+}
+
+.box .paymentInfo .accordion .ui-accordion-header.ui-accordion-header-active {
+    border: 1px solid #d8d8d8 !important;
+}
+
+.box .paymentInfo .accordion .ui-accordion-header.ui-accordion-header-active i {
+    background-position: 0 0;
+}
+
+.box .paymentInfo .accordion .ui-accordion-header.ui-accordion-header-active.ui-state-hover {
+    color: #4195f5;
+}
+
+.box .paymentInfo .accordion .ui-accordion-header.ui-accordion-header-active.ui-state-hover i {
+    background-position: -10px 0;
+}
+
+.box .paymentInfo .accordion .clause {
+    height: auto;
+    margin: -2px 0 0 0;
+    border: 1px solid #d8d8d8;
+    font-size: 11px;
+    color: #666;
+    letter-spacing: -1px;
+}
+
+.box .paymentInfo .accordion .clause .tip {
+    margin-bottom: 2px;
+    font-size: 11px;
+    color: #666666;
+    letter-spacing: -1px;
+}
+
+.box .paymentInfo .accordion .clause .paymentTip {
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+.box .paymentInfo .accordion .clause .paymentTip thead th {
+    height: auto;
+    padding: 9px 0;
+    text-align: center;
+    font-size: 11px;
+    color: #666666;
+    letter-spacing: -1px;
+}
+
+.box .paymentInfo .accordion .clause .paymentTip tbody td,
+.box .paymentInfo .accordion .clause .paymentTip tfoot td {
+    padding: 15px;
+    font-size: 11px;
+    color: #666666;
+    text-align: left;
+    line-height: 16px;
+    vertical-align: top;
+    letter-spacing: -1px;
+}
+
+.box .paymentInfo .accordion .clause .btn {
+    display: inline-block;
+    width: 103px;
+    margin-right: 14px;
+    padding: 8px 0;
+    border: 1px solid #b8b8b8;
+    text-align: center;
+    vertical-align: top;
+}
+
+.box .paymentInfo .accordion .clause .legalTip {
+    display: inline-block;
+    width: 500px;
+    line-height: 16px;
+    vertical-align: bottom;
+}
+
+.eventHeader .eventInfo {
+    border-bottom: 1px solid #ebebeb;
+}
+
+.eventHeader .eventInfo dt,
+.eventHeader .eventInfo dd {
+    display: inline-block;
+    margin-bottom: 10px;
+    line-height: 16px;
+}
+
+.eventHeader .eventInfo dt {
+    font-size: 11px;
+    color: #666666;
+    letter-spacing: -1px;
+    overflow: hidden;
+}
+
+.eventHeader .eventInfo dt.place {
+    line-height: 24px;
+    vertical-align: top;
+}
+
+.eventHeader .eventInfo dt.place i {
+    vertical-align: middle;
+}
+
+.eventHeader .eventInfo dt i {
+    display: inline-block;
+    width: 13px;
+    height: 16px;
+    margin-right: 5px;
+    background: url(/images3/misc/icon_eventInfo.png) no-repeat 0 0;
+    vertical-align: bottom;
+}
+
+.eventHeader .eventInfo dt.place i {
+    width: 13px;
+    height: 16px;
+    background-position: -14px 0;
+}
+
+.eventHeader .eventInfo dt.attend i {
+    background-position: -28px 0;
+}
+
+.eventHeader .eventInfo dd {
+    width: 500px;
+    padding-left: 9px;
+    color: #333333;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.eventHeader .eventInfo dd.date {
+    font-weight: bold;
+}
+
+.eventHeader .eventInfo dd.place .map {
+    margin-left: 8px;
+    padding: 6px 7px 5px 7px;
+    border: 1px solid #b8b8b8;
+    border-radius: 3px;
+    font-size: 11px;
+    color: #666666;
+    vertical-align: middle;
+    letter-spacing: -1px;
+    line-height: 11px;
+    display: inline-block;
+}
+
+.eventHeader .eventInfo dd.place .map:hover {
+    color: #4195f5;
+}
+
+.eventHeader .eventInfo dd.place > span {
+    float: left;
+    display: inline-block;
+    max-width: 422px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 24px;
+}
+
+.eventHeader .eventInfo dd.place > span.mapNone {
+    display: inline;
+    float: none;
+}
+
+.eventHeader .eventInfo dd .total {
+    padding-right: 10px;
+    border-right: 1px solid #d8d8d8;
+}
+
+.eventHeader .eventInfo dd .total .number {
+    font-weight: bold;
+}
+
+.eventHeader .eventInfo dd .free {
+    padding-left: 10px;
+}
+
+.eventHeader .eventInfo dd .free .number {
+    color: #4195f5;
+    font-weight: bold;
+}
+
+.notify {
+    padding: 2px 0;
+}
+
+.notify input[type=checkbox] {
+    margin-right: 4px;
+    vertical-align: middle;
+}
+
+.notify label {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    margin-right: 4px;
+    background: url(/images3/button/sns/fb.png) no-repeat 0 0;
+    text-indent: -9999px;
+    vertical-align: middle;
+}
+
+.notify label.twitter {
+    background-image: url(/images3/button/sns/tw.png);
+}
+
+.notify label.kakao {
+    background-image: url(/images3/button/sns/ks.png);
+}
+
+.event-summary .number {
+    letter-spacing: 0;
+}
+
+/* 간소화 이후 삭제 코드 */
+/* 이벤트 정보 요약 */
+.event-summary {
+    margin: 0;
+    width: 907px;
+    padding: 20px 20px 20px 10px;
+    _overflow: hidden; /* IE6 경우 제목 단위에서 처리를 못하므로 밖에서 제거 */
+    list-style: none;
+    *list-style-position: inside;
+}
+
+.event-summary .event-title {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    margin-bottom: 8px;
+    height: 21px;
+    line-height: 21px;
+    font-size: 12px;
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.event-summary.event-flag-charging .event-title {
+    padding-left: 56px;
+    background: url(/images3/misc/event-flag-charging.gif) no-repeat left center; /* 색상 변화가 일정하지 않아 이미지 사용함 */
+}
+
+.event-summary .event-schedule,
+.event-summary .event-location,
+.event-summary .event-createDate {
+    line-height: 18px;
+    font-size: 11px;
+    letter-spacing: -1px;
+    color: #666666;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.event-summary.event-mode-compressed .event-schedule,
+.event-summary.event-mode-compressed .event-location {
+    /*margin-left:118px;*//*구글 카나리에서 li가 아래로 내려간거에 대한 교정*//* 20121017 24.0.1298.1 canary에서 이상 없음. SF에서 너비가 좁게 나오는 증상이 있어 제거함. */
+}
+
+.event-summary.event-flag-bannerless .event-banner {
+    display: none;
+}
+
+.event-summary.event-mode-compressed .event-banner,
+.event-summary.event-flag-hot .event-banner { /* borderless 속성보다 우선하므로 아래에 올 것 */
+    display: block;
+}
+
+.event-summary .event-banner .event-flag-hot {
+}
+
+.event-summary.event-flag-hot .event-banner .event-flag-hot {
+    display: block;
+    position: absolute;
+    top: -9px;
+    left: -10px;
+    width: 44px;
+    height: 44px;
+    background: url(/images3/misc/event-flag-hot.png) no-repeat;
+    _background-image: url(/images3/misc/event-flag-hot.gif);
+}
+
+.event-summary .event-location {
+    margin-bottom: 8px; /* 배너 없을때의 높이 보정 */
+}
+
+.event-summary .event-box-fixer {
+    height: 0;
+    line-height: 0;
+    font-size: 0;
+    clear: both;
+}
+
+/* 이벤트 링크. 배너와 제목 공통 */
+.event-summary .event-link {
+    color: #333333;
+    text-decoration: none;
+}
+
+.event-summary .event-link:hover {
+    color: #000000;
+    text-decoration: underline;
+}
+
+/* 이벤트 배너 */
+.event-summary .event-banner {
+    float: left;
+    display: block;
+    margin-right: 9px;
+    border: 0;
+    position: relative;
+    background: #ffffff;
+    _overflow: hidden; /* IE6에서 내부 이미지 크기 처리가 되지 않음 */
+    width: 110px;
+    height: 110px;
+}
+
+.event-summary .event-banner .event-link {
+    display: block;
+    position: absolute;
+    width: 110px;
+    height: 110px;
+}
+
+.event-summary .event-banner img {
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    max-width: 110px;
+    max-height: 110px;
+    min-width: 110px;
+    min-height: 110px;
+    *position: static;
+    *width: expression(new Function('el','var width=(el.clientWidth>28?el.clientWidth:110);el.style.width=width>110?"110px":"auto";el.style.marginLeft=((110-width)/2)+"px"')(this));
+    *height: expression(new Function('el','var height=(el.clientHeight>30?el.clientHeight:110);el.style.height=height>110?"110px":"auto";el.style.marginTop=((110-height)/2)+"px"')(this));
+    _width: 110px;
+    _height: 110px;
+}
+
+.event-summary .event-banner .event-banner-border {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 108px;
+    height: 108px;
+    border: 1px solid #333333;
+    border-color: rgba(51, 51, 51, 0.4);
+    filter: alpha(opacity=40); /* IE8 and under */
+}
+
+.event-summary .event-banner .event-link:hover .event-banner-border {
+    border-color: rgba(51, 51, 51, 0.8);
+    filter: alpha(opacity=80); /* IE8 and under */
+}
+
+/* 참여자 현황 막대 그래프 */
+.event-summary .event-graph {
+    width: 386px;
+    height: 29px;
+    overflow: visible; /* '참여자현황', '대기자현황' 문구 출력시에 밖으로 나갈 수 있음. */
+    float: left; /* 배너 밑으로 들어가는 증상 제거 */
+}
+
+.event-summary .event-graph .event-graph-bar {
+    display: block;
+    position: relative;
+    vertical-align: top;
+    border: 1px solid #d8d8d8;
+    border-bottom: 0;
+    background: #e7e7e7;
+    -webkit-box-shadow: inset 0 1px 0 #e2e2e2;
+    -moz-box-shadow: inset 0 1px 0 #e2e2e2;
+    box-shadow: inset 0 1px 0 #e2e2e2;
+    height: 5px;
+    line-height: 5px;
+    font-size: 5px;
+}
+
+.event-summary .event-graph .event-graph-bar .event-capacity-attend {
+    vertical-align: top;
+    background: #4195f5;
+    margin: -1px 0 0 -1px;
+    border: 1px solid #3289ec;
+    height: 4px;
+    line-height: 4px;
+    font-size: 4px;
+    overflow: hidden;
+}
+
+.event-summary .event-graph .event-graph-bar .event-capacity-standby {
+    vertical-align: top;
+    margin: -1px 0 0 -1px;
+    border: 1px solid #89c754;
+    border-bottom: 0;
+    background: #93d55a;
+    -webkit-box-shadow: inset 0 1px 0 #90d058;
+    -moz-box-shadow: inset 0 1px 0 #90d058;
+    box-shadow: inset 0 1px 0 #90d058;
+    height: 5px;
+    line-height: 5px;
+    font-size: 5px;
+}
+
+.event-summary .event-graph .event-graph-bar span {
+    display: none;
+    position: absolute;
+    top: 6px;
+    left: 1px;
+    width: 58px;
+    height: 20px;
+    line-height: 20px;
+    font-size: 11px;
+    letter-spacing: -1px;
+    text-align: center;
+    background: blue;
+}
+
+.event-summary .event-graph .event-graph-bar .event-capacity-standby span {
+    left: -1px;
+    border: 1px solid #74b13e;
+    color: #74b13e;
+    background: #f9fff3;
+}
+
+.event-summary .event-graph .event-graph-bar .event-capacity-attend span {
+    left: -1px;
+    border: 1px solid #3b8ec1;
+    color: #3b8ec1;
+    background: #eaf7ff;
+}
+
+.event-summary .event-graph .event-graph-text {
+    margin: 5px 0 0;
+    padding: 0;
+    line-height: 14px;
+    font-size: 11px;
+    letter-spacing: -1px;
+}
+
+.event-summary .event-graph .event-graph-text .event-capacity-attend {
+    color: #4195f5;
+}
+
+.event-summary .event-graph .event-graph-text .event-capacity-standby {
+    color: #89c754;
+}
+
+.event-summary .event-graph .event-graph-text .event-capacity-total {
+    color: #333333;
+}
+
+.event-summary .event-graph .event-graph-text .number {
+    font-weight: bold;
+}
+
+.event-summary .event-graph .event-graph-text .bar {
+    margin-left: 5px;
+    margin-right: 6px;
+    color: #ccc;
+}
+
+/* 참여/찜 버튼 */
+.event-summary .event-action {
+    float: right;
+    display: inline-block;
+    *display: inline;
+    *zoom: 1;
+    margin-left: 10px;
+}
+
+.event-summary .event-action a {
+    vertical-align: middle;
+    border: 1px solid #d8d8d8;
+    padding-top: 2px;
+    height: 21px;
+    line-height: 21px;
+    _padding-top: 3px; /* IE6 */
+    _height: 20px;
+    _line-height: 20px;
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: -1px;
+    color: #666666;
+    text-align: center;
+    -webkit-border-radius: 3px 0 0 3px;
+    -moz-border-radius: 3px 0 0 3px;
+    border-radius: 3px 0 0 3px;
+
+    width: 85px;
+    background: #e7e7e7;
+    display: none;
+}
+
+.event-summary .event-action .tip a {
+    display: inline;
+    background: none;
+    border: 0;
+    padding-top: 0;
+    font-weight: normal;
+    vertical-align: top;
+}
+
+/*:root .event-summary .event-action a {
+  padding-top: 3px\0; !* IE9 *!
+  height: 20px\0;
+  line-height: 20px\0;
+}*/
+.event-summary .event-action .highlight {
+    color: #4195f5;
+}
+
+.event-summary .event-action .event-action-pin {
+    margin-left: -1px;
+    border: 1px solid #d8d8d8;
+    background: #e7e7e7;
+    width: 22px;
+    font-weight: normal;
+    text-align: center;
+    -webkit-border-radius: 0 3px 3px 0;
+    -moz-border-radius: 0 3px 3px 0;
+    border-radius: 0 3px 3px 0;
+}
+
+.event-summary .event-action .event-action-attend:hover,
+.event-summary.event-flag-pinned .event-action .event-action-pin,
+.event-summary .event-action .event-action-pin:hover {
+    border-color: #3085e6;
+    background: #4195f5;
+    color: #ffffff;
+    position: relative;
+    z-index: 10; /* 일반 박스보다 상위에 두어, 가장자리를 덮도록 함 */
+}
+
+.event-summary.event-flag-pinned .event-action .event-action-pin:hover {
+    border-color: #3273bd; /* 찜된 상태의 찜 버튼 색상을 변경 */
+    background: #278afa;
+}
+
+.event-summary .event-action .event-action-attend {
+    overflow: hidden;
+}
+
+.event-summary .event-action .event-action-attend span.timestamp {
+    display: block;
+    letter-spacing: -1px;
+}
+
+.event-summary .event-action .event-action-attend:hover span.timestamp {
+    display: none;
+}
+
+.event-summary .event-action .event-action-attend span.timestamp .number {
+    letter-spacing: 0;
+}
+
+.event-summary.event-flag-notyet .event-action .event-action-notyet,
+.event-summary.event-flag-ended .event-action .event-action-ended,
+.event-summary.event-flag-finished .event-action .event-action-finished,
+.event-summary.event-flag-full .event-action .event-action-attend {
+    border-color: #d8d8d8; /* 마감된 모임은 색상 변경 없음 */
+    background: #e7e7e7;
+    color: #666666;
+}
+
+.event-summary.event-flag-field .event-action .event-action-field,
+.event-summary.event-flag-outside .event-action .event-action-outside,
+.event-summary.event-flag-notyet .event-action .event-action-notyet,
+.event-summary.event-flag-ended .event-action .event-action-ended,
+.event-summary.event-flag-finished .event-action .event-action-finished,
+.event-summary.event-flag-attending .event-action .event-action-attending,
+.event-summary .event-action .event-action-attend,
+.event-summary .event-action .event-action-pin {
+    display: inline-block;
+    *display: inline;
+    *zoom: 1;
+}
+
+.event-summary .event-action .event-action-field,
+.event-summary .event-action .event-action-outside,
+.event-summary.event-flag-notyet .event-action .event-action-attend,
+.event-summary.event-flag-ended .event-action .event-action-attend,
+.event-summary.event-flag-finished .event-action .event-action-attend,
+.event-summary.event-flag-finished .event-action .event-action-attending, /* 모임종료 경우에 참가중 표시보다 우선 */
+.event-summary.event-flag-attending .event-action .event-action-ended, /* 참가중 경우에 모집마감 표시보다 우선 */
+.event-summary.event-flag-attending .event-action .event-action-attend {
+    display: none; /* inline-block 보다 나중에 와야 함 */
+}
+
+.event-summary.event-flag-notyet .event-action .event-action-notyet,
+.event-summary.event-flag-finished .event-action .event-action-finished,
+.event-summary.event-flag-field .event-action .event-action-field,
+.event-summary.event-flag-outside .event-action .event-action-outside {
+    width: 287px; /* 버튼 영역을 넓히고 */
+}
+
+.event-summary.event-flag-notyet .event-graph,
+.event-summary.event-flag-finished .event-graph,
+.event-summary.event-flag-field .event-graph,
+.event-summary.event-flag-outside .event-graph {
+    display: none; /* 넓은 버튼에 대해 그래프 숨김 */
+}
+
+.event-summary .event-action a .narrow,
+.event-summary.event-mode-full .event-action a .narrow,
+.event-summary.event-mode-compressed .event-action a .narrow,
+.event-summary.event-mode-mini .event-action a .narrow,
+.event-summary.event-mode-digest .event-action a .wide {
+    display: none; /* 상태에 따른 문구의 표시 방식을 결정 */
+}
+
+.event-summary .event-action a .wide,
+.event-summary.event-mode-full .event-action a .wide,
+.event-summary.event-mode-compressed .event-action a .wide,
+.event-summary.event-mode-mini .event-action a .wide,
+.event-summary.event-mode-digest .event-action a .narrow {
+    display: inline;
+}
+
+.event-summary .event-graph .event-graph-text-notyet,
+.event-summary .event-graph .event-graph-text-ongoing,
+.event-summary .event-graph .event-graph-text-ended {
+    display: none; /* 상태에 따른 문구의 표시 방식을 결정 */
+}
+
+.event-summary .event-graph .event-graph-text-ongoing {
+    display: inline; /* 진행중은 기본 표시 */
+}
+
+.event-summary.event-flag-notyet .event-graph .event-graph-text-ongoing,
+.event-summary.event-flag-ended .event-graph .event-graph-text-ongoing {
+    display: none; /* 진행중 상태가 아니면 진행중 표시 숨김 */
+}
+
+.event-summary.event-flag-notyet .event-graph .event-graph-text-notyet,
+.event-summary.event-flag-ended .event-graph .event-graph-text-ended {
+    display: inline; /* 진행중 상태가 아니면 그 외의 표시를 표시 */
+}
+
+/* 일부 축소 표시 : 메인 페이지 일반 목록
+  - 참여자 상태 표시가 축소됨
+  - 참여자 상태 표시가 참여 버튼과 같은 위치로 옮겨짐
+*/
+.event-summary.event-mode-mini {
+    width: 644px;
+    padding: 20px 10px;
+}
+
+.event-summary.event-mode-mini .event-banner,
+.event-summary.event-mode-smallDigest .event-banner,
+.event-summary.event-mode-mini .event-banner .event-link,
+.event-summary.event-mode-smallDigest .event-banner .event-link {
+    width: 80px;
+    height: 80px;
+}
+
+.event-summary.event-mode-smallDigest .event-banner {
+    margin-right: 0;
+}
+
+.event-summary.event-mode-mini .event-banner img,
+.event-summary.event-mode-smallDigest .event-banner img {
+    max-width: 80px;
+    max-height: 80px;
+    min-width: 80px;
+    min-height: 80px;
+    *width: 80px;
+    *height: 80px;
+}
+
+.event-summary.event-mode-mini .event-banner .event-banner-border,
+.event-summary.event-mode-smallDigest .event-banner .event-banner-border {
+    width: 78px;
+    height: 78px;
+}
+
+.event-summary.event-mode-mini .event-graph {
+    float: right;
+    margin-left: 10px;
+    width: 190px;
+}
+
+.event-summary.event-mode-full .event-graph-text.event-mode-full,
+.event-summary.event-mode-compressed .event-graph-text.event-mode-mini,
+.event-summary.event-mode-mini .event-graph-text.event-mode-mini {
+    display: block;
+}
+
+.event-summary .event-graph-text.event-mode-mini,
+.event-summary.event-mode-full .event-graph-text.event-mode-mini,
+.event-summary.event-mode-compressed .event-graph-text.event-mode-full {
+    display: none;
+}
+
+.event-summary.event-mode-mini .event-action {
+    margin-left: 12px;
+}
+
+.event-summary.event-mode-mini .event-graph,
+.event-summary.event-mode-mini .event-action {
+    padding-top: 4px;
+}
+
+.event-summary.event-mode-mini .event-title {
+    padding-top: 5px;
+}
+
+.event-summary.event-mode-mini .event-schedule,
+.event-summary.event-mode-mini .event-location {
+    padding-left: 1px;
+}
+
+.event-summary.event-mode-mini .event-location {
+    margin-bottom: 7px;
+}
+
+/* 일부 축소 중 가로2단 출력용 : 메인 페이지 추천 목록
+  - 참여자 상태 표시와 참여 버튼이 다른 줄로 변경
+*/
+.event-summary.event-mode-compressed {
+    display: inline-block;
+    *display: inline;
+    *zoom: 1;
+    vertical-align: top;
+    padding: 20px 10px;
+    width: 312px;
+}
+
+.event-summary.event-mode-compressed .event-action {
+    clear: left;
+    margin: 0;
+}
+
+.event-summary.event-mode-compressed .event-graph {
+    clear: left;
+    float: left;
+    width: 190px;
+}
+
+.event-summary.event-mode-compressed .event-banner {
+    margin-bottom: 8px;
+}
+
+.event-summary.event-mode-recommend {
+    padding-top: 0;
+    padding-bottom: 20px;
+}
+
+.event-summary.event-mode-recommend .event-banner {
+    margin-bottom: 0;
+    *margin-right: 0;
+}
+
+.event-summary.event-mode-recommend .event-graph {
+    padding-left: 1px;
+    clear: none;
+    width: 192px;
+    *margin-left: 12px;
+}
+
+.event-summary.event-mode-recommend .event-mode-mini .number {
+    color: #4195f5;
+}
+
+.event-summary.event-mode-recommend .event-location {
+    margin-bottom: 15px;
+}
+
+.event-summary.event-mode-recommend .event-title {
+    padding-top: 5px;
+    margin-bottom: 0;
+    padding-bottom: 1px;
+}
+
+/* 최소화 표시 : 검색 결과
+  - 각 이벤트 사이의 간격은 개별 페이지에서 정의할 것
+*/
+.event-summary.event-mode-digest {
+    display: inline-block;
+    *display: inline;
+    *zoom: 1;
+    vertical-align: top;
+    margin: 0;
+    padding: 0;
+    width: 110px;
+    height: auto;
+}
+
+.event-summary.event-mode-digest .event-schedule,
+.event-summary.event-mode-digest .event-location,
+.event-summary.event-mode-digest .event-graph {
+    display: none;
+}
+
+.event-summary.event-mode-digest .event-banner,
+.event-summary.event-mode-digest .event-action {
+    display: block;
+    float: none;
+    margin: 0;
+    *margin-left: -16px;
+}
+
+.event-summary.event-mode-digest .event-banner,
+.event-summary.event-mode-digest .event-banner .event-link {
+    width: 110px;
+    height: 110px;
+}
+
+.event-summary.event-mode-digest .event-banner img {
+    max-width: 110px;
+    max-height: 110px;
+    min-width: 110px;
+    min-height: 110px;
+    *width: 110px;
+    *height: 110px;
+}
+
+.event-summary.event-mode-digest .event-banner .event-banner-border {
+    width: 108px;
+    height: 108px;
+}
+
+.event-summary.event-mode-digest .event-title {
+    display: block;
+    *margin-left: -16px;
+    padding: 0;
+    width: 110px;
+    height: auto;
+    line-height: 18px;
+    font-size: 12px;
+    font-weight: normal;
+    letter-spacing: 0;
+    white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-wrap: break-word;
+}
+
+.event-summary.event-mode-digest.event-flag-charging .event-title {
+    background: url(/images3/misc/event-flag-charging-digest.gif) no-repeat left top;
+    text-indent: 19px;
+}
+
+.event-summary.event-mode-digest .event-action a {
+    width: 85px !important;
+}
+
+.event-summary.event-mode-digest .event-action .event-action-pin {
+    width: 22px !important;
+}
+
+/*추천모임 확장*/
+.event-summary.event-mode-smallDigest {
+    display: inline-block;
+    *display: inline;
+    *zoom: 1;
+    vertical-align: top;
+    margin: 0;
+    padding: 0;
+    width: 80px;
+    padding-right: 33px;
+    padding-top: 20px;
+}
+
+.event-summary.event-mode-smallDigest .event-title {
+    display: block;
+    padding: 0;
+    margin: 0;
+    padding-top: 10px;
+    *margin-left: -15px;
+    width: 82px;
+    height: auto;
+    max-height: 28px;
+    line-height: 14px;
+    font-size: 11px;
+    letter-spacing: -1px;
+    color: #666;
+    font-weight: normal;
+    white-space: normal;
+    overflow: hidden;
+    text-align: center;
+}
+
+.event-summary.event-mode-smallDigest .event-link a {
+    color: #666;
+}
+
+.event-summary.event-mode-smallDigest .event-link a:hover {
+    color: #333;
+}
+
+/* 모임보기 페이지용 */
+.event-summary.event-mode-view {
+    width: auto;
+}
+
+.event-summary.event-mode-view .event-title {
+    display: none;
+}
+
+.event-summary.event-mode-view .event-title .event-link {
+    display: none;
+}
+
+.event-summary.event-mode-view .event-graph-bar {
+    width: 386px;
+}
+
+.event-summary.event-mode-view.event-flag-field .event-action,
+.event-summary.event-mode-view.event-flag-outside .event-action,
+.event-summary.event-mode-view.event-flag-notyet .event-action,
+.event-summary.event-mode-view.event-flag-endsoon .event-action,
+    /* .event-summary.event-mode-view.event-flag-ended .event-action, */
+.event-summary.event-mode-view.event-flag-finished .event-action /*,
+.event-summary.event-mode-view.event-flag-attending .event-action */
+{
+    float: none;
+    margin-left: 0;
+}
+
+.event-summary.event-mode-view.event-flag-field .event-action .event-action-field,
+.event-summary.event-mode-view.event-flag-outside .event-action .event-action-outside,
+.event-summary.event-mode-view.event-flag-notyet .event-action .event-action-notyet,
+.event-summary.event-mode-view.event-flag-endsoon .event-action .event-action-endsoon,
+    /* .event-summary.event-mode-view.event-flag-ended .event-action .event-action-ended, */
+.event-summary.event-mode-view.event-flag-finished .event-action .event-action-finished /*,
+.event-summary.event-mode-view.event-flag-attending .event-action .event-action-attending */
+{
+    width: 362px;
+}
+
+/* 참여현황 그래프 및 숫자 표시 */
+.event-summary.event-flag-noprogress .event-graph {
+    display: none;
+}
+
+.event-graph-text {
+    color: #666;
+}
+
+.event-schedule span, .event-location span {
+    color: #333;
+}
+
+/* 내가 개설한 모임 양식 event-owned-list */
+ul.event-owned-list.event-summary {
+    height: 50px;
+    padding: 10px 0;
+    width: 895px;
+    line-height: 18px;
+    position: relative;
+}
+
+ul.event-owned-list.event-summary .event-banner,
+ul.event-owned-list.event-summary .event-banner .event-link {
+    height: 50px;
+    width: 50px;
+}
+
+ul.event-owned-list.event-summary .event-banner img {
+    max-height: 50px;
+    max-width: 50px;
+    min-height: 50px;
+    min-width: 50px;
+    height: 50px;
+    width: 50px;
+}
+
+ul.event-owned-list.event-summary .event-banner .event-banner-border {
+    height: 48px;
+    width: 48px;
+}
+
+ul.event-owned-list.event-summary .event-status,
+ul.event-owned-list.event-summary .event-freePaid {
+    display: inline-block;
+    *display: inline;
+    *zoom: 1;
+    height: 11px;
+    line-height: 11px;
+    font-size: 11px;
+    background-color: #fe9e35;
+    color: #fff;
+    border: 1px solid #f48e1f;
+    padding: 5px 8px 2px 8px;
+    -webkit-border-radius: 3px 3px 3px 3px;
+    -moz-border-radius: 3px 3px 3px 3px;
+    border-radius: 3px 3px 3px 3px;
+    margin-right: 4px;
+    margin-top: 5px;
+}
+
+ul.event-owned-list.event-summary .event-freePaid.free {
+    background-color: #64be04;
+    border-color: #529f00;
+}
+
+ul.event-owned-list.event-summary .event-status.progress {
+    background-color: #fd675a;
+    border-color: #d5483c;
+}
+
+ul.event-owned-list.event-summary .event-status.end {
+    background-color: #999;
+    border-color: #898989;
+}
+
+ul.event-owned-list.event-summary .event-title {
+    display: inline-block;
+    *display: inline;
+    *zoom: 1;
+    padding: 0;
+    margin: 0;
+    font-size: 12px;
+    line-height: 12px;
+    height: auto;
+    font-weight: normal;
+    width: 660px;
+    vertical-align: top;
+    padding-bottom: 4px;
+    padding-top: 5px;
+    margin-top: 4px;
+    padding-left: 2px;
+}
+
+ul.event-owned-list.event-summary .event-createDate,
+ul.event-owned-list.event-summary .event-schedule {
+    display: inline-block;
+    *display: inline;
+    *zoom: 1;
+    line-height: 11px;
+    padding-top: 1px;
+    margin-right: 23px;
+    padding-left: 14px;
+    margin-top: 9px;
+    background: url(/images3/misc/icon_manage.gif) 0 -20px no-repeat;
+    color: #999;
+}
+
+ul.event-owned-list.event-summary .event-createDate span,
+ul.event-owned-list.event-summary .event-schedule span {
+    color: #999;
+}
+
+ul.event-owned-list.event-summary .event-schedule {
+    background-position: 0 -40px;
+    padding-left: 16px;
+}
+
+ul.event-owned-list.event-summary .event-banner {
+    margin-right: 10px;
+}
+
+ul.event-owned-list.event-summary .event-action {
+    float: none;
+    margin: 0;
+    position: absolute;
+    right: 61px;
+    *right: 76px;
+    top: 23px;
+}
+
+ul.event-owned-list.event-summary .event-action a.event-action-manage {
+    display: inline-block;
+    *display: inline;
+    *zoom: 1;
+    line-height: 19px;
+    height: 19px;
+    border: 1px solid #b9b9b9;
+    font-size: 11px;
+    letter-spacing: -1px;
+    color: #666;
+    padding-left: 6px;
+    padding-right: 7px;
+    border-radius: 0;
+    width: auto;
+    background-color: #fff;
+    font-weight: normal;
+}
+
+ul.event-owned-list.event-summary .event-copy {
+    float: none;
+    margin: 0;
+    position: absolute;
+    right: 0px;
+    *right: 15px;
+    top: 23px;
+}
+
+ul.event-owned-list.event-summary .event-copy a.event-action-copy {
+    display: inline-block;
+    *display: inline;
+    *zoom: 1;
+    line-height: 19px;
+    height: 19px;
+    border: 1px solid #b9b9b9;
+    font-size: 11px;
+    letter-spacing: -1px;
+    color: #666;
+    padding-top: 2px;
+    _padding-top: 3px; /* IE6 */
+    padding-left: 6px;
+    padding-right: 7px;
+    border-radius: 0;
+    width: auto;
+    background-color: #fff;
+    font-weight: normal;
+    vertical-align: middle;
+}
+
+ul.event-owned-list.event-summary .event-action a.event-action-manage:hover,
+ul.event-owned-list.event-summary .event-copy a.event-action-copy:hover {
+    color: #4195f5;
+    border-color: #b9b9b9;
+}
+
+/*추가*/
+ul.event-summary .event-status,
+ul.event-summary .event-freePaid {
+    display: none;
+    height: 12px;
+    line-height: 11px;
+    font-size: 11px;
+    background-color: #fe9e35;
+    color: #fff;
+    border: 1px solid #f48e1f;
+    padding: 4px 10px 2px 11px;
+    -webkit-border-radius: 3px 3px 3px 3px;
+    -moz-border-radius: 3px 3px 3px 3px;
+    border-radius: 3px 3px 3px 3px;
+    margin-right: 4px;
+    font-weight: normal;
+    letter-spacing: -1px;
+}
+
+ul.event-summary.event-mode-status .event-title {
+    display: block;
+}
+
+ul.event-summary.event-mode-status .event-title .event-link {
+    display: inline;
+    font-weight: normal;
+}
+
+ul.event-summary.event-mode-status .event-freePaid {
+    padding-left: 9px;
+    padding-right: 9px;
+}
+
+ul.event-summary.event-mode-status .event-status,
+ul.event-summary.event-mode-status .event-freePaid {
+    display: inline-block;
+    *display: inline;
+    *zoom: 1;
+}
+
+ul.event-summary .event-freePaid.free {
+    background-color: #64be04;
+    border-color: #529f00;
+}
+
+ul.event-summary .event-status.progress {
+    background-color: #fd675a;
+    border-color: #d5483c;
+}
+
+ul.event-summary .event-status.end {
+    background-color: #999;
+    border-color: #898989;
+}
+
+div.attendReviewPaymentErrorWrap {
+    width: 680px;
+    margin: 30px auto 0 auto;
+    padding: 10px 0;
+    background-color: #f7f7f7;
+    text-align: center;
+    vertical-align: top;
+}
+
+div.attendReviewPaymentErrorWrap > p {
+    display: inline-block;
+    line-height: 30px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #333;
+}
+
+div.attendReviewPaymentErrorWrap > a,
+p.attendReviewPaymentError > a {
+    display: inline-block;
+    padding: 0 18px;
+    margin: 0 0 0 10px;
+    line-height: 28px;
+    font-size: 11px;
+    font-weight: normal;
+    color: #666;
+    text-decoration: none !important;
+    letter-spacing: -1px;
+    background-color: #fff;
+    border: 1px solid #b8b8b8;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+}
+
+div.attendReviewPaymentErrorWrap > a:hover,
+p.attendReviewPaymentError > a:hover {
+    color: #4191f5;
+}
+
+p.attendReviewPaymentError {
+    margin: 30px 0 0 0 !important;
+    padding: 0;
+    display: block;
+    text-align: center;
+    line-height: 1;
+}
+
+.eventMap {
+    display: none;
+}
+
+.eventMap h3 {
+    margin-bottom: 5px;
+    font-size: 16px;
+}
+
+.mapDescription {
+    height: auto;
+    margin: 8px 0 8px 0;
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 20px;
+}
+
+.mapDescription i {
+    display: block;
+    width: 13px;
+    height: 23px;
+    float: left;
+    margin: 2px 10px 6px 0;
+    background: url(/images3/misc/icon_eventInfo.png) no-repeat -14px 0;
+    vertical-align: bottom;
+}
+
+#mapzone {
+    margin: 0 auto;
+    width: 918px;
+    height: 400px;
+    border: 1px solid #cccccc;
+}

@@ -1,0 +1,553 @@
+$(function () {
+	$.fn.qtip.zindex = 800;
+
+	// 오늘본기록 : 표시부터 한 다음에 현재 URL을 저장
+	_trail.load();
+	_trail.save();
+
+	//
+	var eventCount = 0;
+	var eventLayer = $('.layerServiceNavigation');
+	var menuLayer = $('div.menuLayer');
+
+	$('.onoffmix').on('click', function(event) {
+		var _target = $(event.target).offsetParent();
+
+		if($(event.target).is('.menuLayer')) {
+
+			if(eventCount == 0) {
+				eventLayer.show(); eventCount++;
+				menuLayer.addClass('selected');
+			}else {
+				eventLayer.hide(); eventCount = 0;
+				menuLayer.removeClass('selected');
+			}
+		}else if($(event.target).is('.close')) {
+			if (eventCount == 0) { /* pass */
+			}else {
+				eventLayer.hide();
+				eventCount = 0;
+				menuLayer.removeClass('selected');
+			}
+		}else if(_target.is('.layerServiceNavigation')) {
+		}else {
+			if(eventCount == 0) {
+			 /* pass */
+			}else {
+				eventLayer.hide();
+				eventCount = 0;
+				menuLayer.removeClass('selected');
+			}
+		}
+	});
+
+
+	$('*[data-tooltip]').each(function () {
+		var onoffmix_data = 'data-tooltip';
+		var class_name = 'onoffmix-qtip';
+		if ($(this).is('*[data-tooltip-noPadding]')) {
+			onoffmix_data = 'data-tooltip-noPadding';
+			class_name = 'no-padding';
+		}
+			$(this).qtip({
+				content: {
+					attr: onoffmix_data
+				},
+				hide: {
+					fixed: true
+					, delay: 200
+				},
+				position: {
+					my: 'top center'
+					, at: 'bottom center'
+					, adjust: {y: 3}
+				},
+				style: {
+					classes: class_name
+				}
+			});
+	});
+
+	// 검색 영역 배경
+	if ($('#searchInput').val() != '') {
+		$('#searchInput').removeClass('default').addClass('focus');
+	} else {
+		$('#searchInput').on({
+			keydown : function() {
+				$(this).removeClass('default').addClass('focus');
+			}, keyup : function() {
+				if ($(this).val() == '') {
+					$(this).removeClass('focus').addClass('default');
+				}
+			},
+			blur : function() {
+				if ($(this).val() == '') {
+					$(this).removeClass('focus').addClass('default');
+				}
+			}
+		});
+	}
+
+	// 서브브랜드
+	$('#header .serviceMenu li.btnSubBrand a, .layerDetailSubBrand').on('mouseenter focus', function() { $('.layerDetailSubBrand').show(); });
+	$('#header .serviceMenu li.btnSubBrand a, .layerDetailSubBrand').on('mouseleave blur', function() { $('.layerDetailSubBrand').hide(); });
+	// 마이페이지
+	$('#header .serviceMenu li.btnMypage a, .layerDetailMypage').on('mouseenter focus', function() { $('.layerDetailMypage').show(); });
+	$('#header .serviceMenu li.btnMypage a, .layerDetailMypage').on('mouseleave blur', function() { $('.layerDetailMypage').hide(); });
+	var isIE = !+"\v1", isIE6 = isIE && window.XMLHttpRequest === undefined;
+	// ie6 이하일때 업그레이드 안내영역 닫기 버튼 이벤트
+	if ($.browser.msie && parseFloat($.browser.version) < 8) {
+		$('.header .ie6 a.close').click(function () {
+			$('table.header').animate({'margin-top': -121}, 400);
+			return false;
+		});
+	}
+
+	var issueListDefaults = [
+		{name:'url',value:base_apiUrl+'/event/list'}
+		,{name:'output',value:'json'}
+	];
+
+	// todayEvent event button 활성화
+	$(document).on('.todayEvent .eventButton', {
+		mouseenter : function(){
+			$(this).addClass('hovered');
+		},
+		mouseleave : function(){
+			$(this).removeClass('hovered');
+		}
+	});
+
+
+	if($('.todayEvent').hasClass('event-flag-attending')){
+		$('.todayEvent.event-flag-attending .eventBottomArea .eventPersonnel .eventButton').addClass('edit');
+	}
+
+	if($('.seeEventLayer .qtip-content .title').length>0)
+		$('.seeEventLayer .qtip-content .title').dotdotdot();
+});
+
+var getWidth, getLeft, getTopMypage, getTopBrand, _resizeTimer=null;
+$(window).resize(function() {
+	if ($('.content').length == 0) return;
+
+	_resizeTimer && clearTimeout(_resizeTimer);
+	_resizeTimer = setTimeout(function() {
+		getWidth = parseInt($('body').width());
+		if (getWidth < 1156 && getWidth >= 981) {
+			getLeft = $('.content').offset().left;
+			//$('#header .headerArea').css('margin', '0 0 0 '+getLeft+'px');
+			getTopMypage = ($('.btnMypage').length>0)?$('.btnMypage').offset().left:0;
+			$('.layerDetailMypage').css({'left': (getTopMypage-3) + 'px', 'margin': 0});
+			getTopBrand = ($('.btnSubBrand').length>0)?$('.btnSubBrand').offset().left:0;
+			$('.layerDetailSubBrand').css({'left': (getTopBrand-4) + 'px', 'margin': 0});
+		} else if (getWidth < 980) {
+			//$('#header .headerArea').css('margin', '0');
+			getTopMypage = ($('.btnMypage').length>0)?$('.btnMypage').offset().left:0;
+			$('.layerDetailMypage').css({'left': (getTopMypage-3) + 'px', 'margin': 0});
+			getTopBrand = ($('.btnSubBrand').length>0)?$('.btnSubBrand').offset().left:0;
+			$('.layerDetailSubBrand').css({'left': (getTopBrand-4) + 'px', 'margin': 0});
+		} else {
+			//$('#header .headerArea').css('margin', '0 auto');
+			$('.layerDetailSubBrand').css({'left': '50%', 'margin': '0 0 0 176px'});
+			$('.layerDetailMypage').css({'left': '50%', 'margin': '0 0 0 261px'});
+		}
+	}, 100)
+});
+
+if(!Object.keys) {
+	Object.keys = function(obj) {
+		return $.map(obj, function(v, k) {
+			return k;
+		});
+	};
+}
+
+var _trail = {
+	// config vars
+	cookieName : '_ts',
+	useType: {"e": "event", "p": "place", "m": "market"},
+	wingBox: '.wingMiddle dl',
+
+	// Autocreate vars, Auto Create in _trail.init()
+	saveRule: '',
+	loadRule: '',
+	wingClass: {},
+
+	// other vars
+	data: {
+		len: 0
+	},
+	xhr: [],
+
+	// functions
+
+	init: function() {
+		_trail.saveRule = new RegExp("\\/(" + $.map( _trail.useType, function(v, i){ return v; }).join('|') + ")\\/([0-9]+)\\/?");
+		_trail.loadRule = new RegExp("(" + Object.keys( _trail.useType).join('|') + ")([0-9]+)");
+		for(var key in _trail.useType){
+			var str = _trail.useType[key]+'';
+			_trail.wingClass[key] = 'wing'+ str.charAt(0).toUpperCase() + str.substr(1) +'Box';
+		}
+
+	},
+	/**
+	 *
+	 * @param type
+	 * @returns {undefined|The}
+	 */
+	list: function(type){ // raw, parse. keyList
+		var val = $.cookie(_trail.cookieName);
+		if (!val) return val;
+
+		if(type && ( type=='parse' || type=='keyList') )
+			val = JSON.parse(val);
+		if(type && ( type=='keyList') )
+			val = Object.keys(val);
+
+		return val;
+	},
+// TODO: Ajax 호출 대신 localStorage 사용 고려
+	load: function(pageNow, pageSpan) {
+		if (!$.cookie || typeof JSON == 'undefined') return;
+		if (typeof pageNow == 'undefined' || pageNow < 1) pageNow = 1;
+		else pageNow = parseInt(pageNow);
+		if (typeof pageSpan == 'undefined' || pageSpan < 1) pageSpan = 2;
+		else pageSpan = parseInt(pageSpan);
+		var val = _trail.list('keyList');
+		if (!val) return;
+		_trail.init();
+
+		$(_trail.wingBox).each(function () {
+			var self = $(this);
+
+			_trail.setArrow(self, val, pageNow, pageSpan);
+			_trail.getData(self, _trail.data.items, val, pageNow, pageSpan);
+		});
+	},
+	getData: function(self, list, val, pageNow, pageSpan) {
+		$(list).each(function(pos, i) {
+			var box=$('.pos',self).eq(pos);
+			if (i < 0) {
+				box.empty();
+			} else {
+				var url, matched=val[i].match(_trail.loadRule);
+				if (matched[1] && _trail.useType.hasOwnProperty(matched[1])) {
+					url='/'+_trail.useType[matched[1]]+'/'+matched[2];
+				}
+				_trail.xhr.push( $.ajax({
+					url: '//'+base_apiUrl+url
+					,data: {apikey:'D9zfVRWvvGRYu66k', output:'json'}
+					,dataType: 'jsonp'
+				}).fail(function(xhr, status, error) {
+					box.empty();
+				}).done(function(data, status, xhr) {
+					if (data.error && data.error.message) {
+						//data.url = url;
+						//console.log('error on loading url "'+data.url+'", error: '+data.error.message);
+						$.each(_trail.xhr, function(){
+							this.abort();
+						});
+
+						_trail.delFromList(val[i]);
+						_trail.load(pageNow, pageSpan);
+					} else {
+						box.html(
+							$('script.'+_trail.wingClass[matched[1]])
+								.tmpl(_trail.makeBoxData(data)) );
+						_trail.makeTooltip(self, box);
+					}
+				}) );
+			}
+		});
+	},
+	makeBoxData: function(data){
+		var boxData={};
+		if (data.event) {
+			boxData.comment = data.event.title;
+			boxData.link = data.event.eventUrl;
+			boxData.image = data.event.bannerUrl || defaultImageAdvert;
+			boxData.additional = (data.event.isShowProgress == 'y') ? data.event.totalCapacity - data.event.totalAttend : 0;
+			boxData.isShowProgress = data.event.isShowProgress;
+			if (data.event.wayOfRegistration && data.event.wayOfRegistration.indexOf("advance") == -1) {
+				boxData.additional = 0;
+				boxData.isShowProgress = "n";
+			}
+		} else if (data.place) {
+			boxData.comment = data.place.name;
+			boxData.link = data.place.placeUrl;
+			boxData.image = data.place.bannerUrl || defaultImageAdvert;
+			boxData.additional = data.place.capacity;
+		} else if (data.goods) {
+			boxData.comment = data.goods.title;
+			boxData.link = data.goods.goodsUrl;
+			boxData.image = data.goods.bannerUrl || defaultImageAdvert;
+			boxData.additional = data.goods.price;
+		}
+
+		return boxData;
+	},
+	makeTooltip: function(self, box){
+		// 툴팁 처리
+		$('a span',box).each(function(){
+			var self=$(this), nextImg=$(this).next('img'),
+					person=nextImg.data('personnel'), price=nextImg.data('price'), recperson=nextImg.data('recperson'),
+					isShowProgress = nextImg.data('showprogress');
+			var wData=[{
+				'title': nextImg.data('title')
+				,'link' : nextImg.data('link')
+				,'isShowProgress' : isShowProgress
+				,'person' : person
+				,'price' : price
+				,'recperson' : recperson
+			}];
+			var tmp;
+			if(typeof(person) != 'undefined') tmp='wingEvent';
+			else if(typeof(price) != 'undefined') tmp='wingMarket';
+			else if(typeof(recperson) != 'undefined') tmp='wingPlace';
+			var template = $('script.'+tmp).tmpl(wData);
+			self.qtip({
+				content: template,
+				position: {
+					my: 'right center',
+					at: 'left center'
+				},
+				hide: {
+					fixed: true
+				},
+				style: {
+					tip: {
+						corner: false
+					},
+					classes: 'seeEventLayer'
+				},
+				show: {
+					event: 'mouseenter focus'
+				}
+			});
+		});
+	},
+	setArrow: function(self, val, pageNow, pageSpan) {
+		var arrow =  {
+			left: $(_trail.wingBox).find('.leftArrow a'),
+			right: $(_trail.wingBox).find('.rightArrow a')
+		}, len, pageTotal, i1, i2;
+		len = val.length;
+		pageTotal = Math.ceil(len / 2);
+		self.find('.pagingArea .paging .pageNow').text(pageNow);
+		self.find('.pagingArea .paging .pageTotal').text(pageTotal);
+		len--;
+		i1 = len - (pageNow - 1) * pageSpan;
+		i2 = len - (pageNow - 1) * pageSpan - 1;
+
+		if (i1 >= _trail.data.len || i2 >= len) {
+			arrow.left.removeAttr('href');
+		} else {
+			arrow.left.attr('href','#');
+		}
+		if (i1 <= 0 || i2 <= 0) {
+			arrow.right.removeAttr('href');
+		} else {
+			arrow.right.attr('href','#');
+		}
+		arrow.left.off('click.trailAct').on('click.trailAct', function(event) {
+			event.preventDefault();
+			event.stopImmediatePropagation();
+			var self=$(this);
+			if (!self.attr('href')) return;
+			_trail.load(pageNow-1);
+		});
+		arrow.right.off('click.trailAct').on('click.trailAct', function(event) {
+			event.preventDefault();
+			event.stopImmediatePropagation();
+			var self=$(this);
+			if (!self.attr('href')) return;
+			_trail.load(pageNow+1);
+		});
+
+		_trail.data.len = len;
+		_trail.data.items = [i1, i2];
+	},
+	save: function(val) {
+		var name = _trail.cookieName;
+		if (!$.cookie || typeof JSON=='undefined') return;
+		if(typeof(val)==='undefined')
+			var val = _trail.list('parse');
+		_trail.init();
+
+		setTimeout(function() {
+			(function($c) {
+				var matched=location.pathname.match(_trail.saveRule);
+				if (matched && matched.length>=3) {
+					var type=matched[1].substr(0,1), key=type+matched[2], cur={};
+					var cookie_domain = "." + document.domain;
+
+					cur[key] = 1;
+					if (val && val[key]) {
+						cur[key] = val[key];1
+						delete val[key];
+					}
+					val = $.extend(val, cur);
+				} else if(typeof(val)==='undefined'){
+					return false;
+				}
+				if (Object.keys(val).length > 18) {
+					delete val[ Object.keys(val)[0] ];
+				}
+
+				$c(name, JSON.stringify(val), {
+					path :"/",
+					domain : cookie_domain
+				});
+				
+				return true;
+			})($.cookie);
+		});
+	},
+	delFromList: function(key){
+		var val = _trail.list('parse');
+		_trail.init();
+
+		if(typeof(key)==='undefined'){
+			return false;
+		}
+
+		if (val && val[key]) {
+			delete val[key];
+		}
+
+		return _trail.save(val);
+	}
+};
+
+/**
+ * 모임정보 출력
+ * clone of utilFunctionPrintableAdvert::_print_advert(advert)
+ *
+ * @param object advert  {type:'', event: advert}
+ * @returns node  html block
+ * @private
+ */
+function _print_advert(advert) {
+	if (typeof(advert) === 'string' && advert == 'noneToday') { advert = {'type': 'noneToday'}; }
+	if (typeof(advert.type) === 'undefined') return '';
+
+	if ((!('defaultImage' in advert) || !(advert.defaultImage)) && !(advert.event && advert.event.bannerUrl)){
+			advert.defaultImage = defaultImageAdvert;
+	}
+
+	if ((typeof(advert.event) !== 'undefined') && (typeof(advert.event) === 'object')) {
+		var e = advert.event;
+		e._isOnline = (e.wayOfRegistration).indexOf('advance', 0) > -1;
+		e._isOutside = (e.wayOfRegistration).indexOf('outside', 0) > -1;
+		e._isField = (e.wayOfRegistration).indexOf('field', 0) > -1;
+		e._isOutsideAndField = e._isOutside && e._isField;
+		e._isRecruiting = (strtotime(e.recruitEndDateTime) - Math.floor(new Date().getTime() / 1000)) >= 0;
+		e._isEventStart = (strtotime(e.eventEndDateTime) - Math.floor(new Date().getTime() / 1000)) <= 0;
+		e._isFuture = (strtotime(e.recruitStartDateTime) - Math.floor(new Date().getTime() / 1000)) >= 0;
+		e._isPast = (strtotime(e.recruitEndDateTime) - Math.floor(new Date().getTime() / 1000)) <= 0;
+		e._isPath = false;
+		e._isShowProgress = (e.isShowProgress == 'y');
+		e._remains = (typeof(e.totalCanAttend) !== "undefined") ?  e.totalCanAttend : ( e.totalCapacity - e.totalAttend );
+		e._remainsGTE1000 = e._isOnline && e._remains >= 1000;
+		e._remainsLT1000 = e._isOnline && e._remains < 1000;
+		e._remainsZero = e._isOnline && e._remains == 0;
+		e._remainTimeStart = _relativeTime(strtotime(e.recruitStartDateTime), true, false).replace(/(\d+)/, '<strong>$1</strong>');
+		e._remainTimeEnd = _relativeTime(strtotime(e.recruitEndDateTime), true, false).replace(/(\d+)/, '<strong>$1</strong>');
+		e.defaultComment =    (advert.defaultComment) ? advert.defaultComment : e.title;
+		e.defaultLink =       (advert.defaultLink   ) ? advert.defaultLink : e.eventUrl;
+		e.defaultImage =      (advert.defaultImage  ) ? advert.defaultImage : e.bannerUrl;
+		e.additionalComment = (advert.imageMap      ) ? advert.imageMap : '';
+		e.additionalImage =   (advert.imageUrl2     ) ? advert.imageUrl2 : '';
+
+		// 계산을 위하여...
+		for (var i in e) {
+			if ($.inArray(i, ['totalSum', 'totalAttend', 'totalStandby', 'totalCapacity']) > -1) {
+				e[i] = Number(e[i]);
+			}
+		}
+		// graph
+		if (e._isOnline && e.isShowProgress == 'y') {
+			e.totalSum = e.totalAttend + e.totalStandby;
+			if (e.totalSum == 0) {
+				graph_width_sum = 0;
+				graph_width_attend = 0;
+			} else {
+				if (e.totalSum > e.totalCapacity) e.totalSum = e.totalCapacity;
+				graph_width_sum = e.totalSum / e.totalCapacity * 100;
+				if (graph_width_sum > 100) graph_width_sum = 100;
+				graph_width_attend = e.totalAttend / e.totalSum * 100;
+				if (graph_width_attend > 100) graph_width_attend = 100;
+			}
+		} else {
+			graph_width_sum = 0;
+			graph_width_attend = 0
+		}
+		e._widthStandby = graph_width_sum;
+		e._widthAttend = graph_width_attend;
+	} else {
+		e = {};
+		e.defaultComment =    (advert.defaultComment) ? advert.defaultComment : '';
+		e.defaultLink =       (advert.defaultLink   ) ? advert.defaultLink : '';
+		e.defaultImage =      (advert.defaultImage  ) ? advert.defaultImage : '';
+	}
+	if (advert.cssClass) {
+		if (e.cssClass) {
+			e.cssClass = e.cssClass + ' ' + advert.cssClass;
+		} else {
+			e.cssClass = advert.cssClass;
+		}
+	}
+	if (advert.type) {
+		return $.tmpl(advert.type, e);
+	}
+} // _print_advert
+
+// 각 상대시각 표시 - 실제구동
+$(function(){
+	if($('span.timestamp').length>0){
+// 상대시각 표시 반복 처리
+		_postprocessRelativeTime();
+		setInterval(function() { _postprocessRelativeTime(); }, 60000); // 1분마다
+
+	}
+});
+
+// 각 상대시각 표시
+function _postprocessRelativeTime(target) {
+	if (typeof target == 'undefined') target = 'span.timestamp';
+	$(target).filter('[_timestamp]').each(function(index, obj) {
+		var self=$(obj);
+		var prefix=self.attr('_prefix'), suffix=self.attr('_suffix'), type=self.attr('_type'), direction=self.attr('_direction');
+		if (typeof prefix == 'undefined') prefix = '';
+		if (typeof suffix == 'undefined') suffix = '';
+		direction = (direction!='reverse');
+		if (type == 'long') {
+			result = _relativeTimeLong(parseInt(self.attr('_timestamp')),true,direction);
+		} else {
+			result = _relativeTime(parseInt(self.attr('_timestamp')),true,direction);
+		}
+		self.html( prefix + result.replace(/([0-9]+)/g,'<span class="number">$1</span>') + suffix );
+	});
+}
+
+// http://www.jacklmoore.com/notes/naturalwidth-and-naturalheight-in-ie/
+(function($){
+	var props = ['Width', 'Height'], prop;
+	while (prop = props.pop()) {
+		(function (natural, prop) {
+			$.fn[natural] = (natural in new Image()) ?
+				function () {
+					return this[0][natural];
+				} :
+				function () {
+					var node = this[0], img, value;
+					if (node.tagName.toLowerCase() === 'img') {
+						img = new Image();
+						img.src = node.src, value = img[prop];
+					}
+					return value;
+				};
+		}('natural' + prop, prop.toLowerCase()));
+	}
+}(jQuery));

@@ -1,0 +1,41 @@
+/* /html3/    serviceIndex.ofm    saf3+, chrome1+    ONOFFMIX-1381 */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+    .serviceMainArea .btnArea .btnMore {
+        margin-top: -6px;
+    }
+}
+
+.content table.basic ul.faq {
+    padding-top: 16px \0/ IE8+11;
+    padding-bottom: 5px \0/ IE8+11;
+}
+
+.content table.basic div.faq {
+    padding-top: 14px \0/ IE8+11;
+    padding-bottom: 5px \0/ IE8+11;
+}
+
+/* html2/ mypageModify.ofm */
+.core table.form tbody td {
+    padding-top: 14px \0/ IE8+11;
+}
+
+.core table.form tbody th.sms,
+.core table.form tbody td.message {
+    padding-top: 20px \0/ IE8+11;
+    padding-bottom: 16px \0/ IE8+11;
+}
+
+.core .basic table.form fieldset {
+    margin-bottom: 16px \0/ IE8+11;
+    padding-bottom: 1px \0/ IE8+11;
+}
+
+.core .basic table.form fieldset .wrap {
+    margin-top: -1px \0/ IE8+11;
+    padding-bottom: 15px \0/ IE8+11;
+}
+
+.core .basic table.form fieldset .wrap.emailUser {
+    margin-top: -24px \0/ IE8+11;
+}
